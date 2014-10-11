@@ -28,8 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import tracker.*;
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
@@ -134,6 +133,26 @@ public class Handler1 implements MagpieExecutor {
         configer = new TrackerConfiger(username, password, address, port, slaveId, hbase);
     }
 
+    public Handler1() {
+        try {
+            InputStream in = new BufferedInputStream(new FileInputStream("conf/tracker.properties"));
+            Properties pro = new Properties();
+            pro.load(in);
+            String sumAddress = pro.getProperty("mysql.address");
+            String[] subStrings = sumAddress.split(":");
+            String address =subStrings[0];
+            int port = Integer.parseInt(subStrings[1]);
+            String username = pro.getProperty("mysql.usr");
+            String password = pro.getProperty("mysql.psd");
+            Long slaveId = Long.valueOf(pro.getProperty("mysql.slaveId"));
+            String hbase = pro.getProperty("hbase.rootdir");
+            configer = new TrackerConfiger(username, password, address, port, slaveId, hbase);
+        } catch (Exception e) {
+            logger.error("load the mysql conf properties failed!!!");
+            e.printStackTrace();
+        }
+    }
+
 
 
 
@@ -180,6 +199,23 @@ public class Handler1 implements MagpieExecutor {
         hbaseOP.getConf().set("hbase.zookeeper.quorum","localhost");
         hbaseOP.getConf().set("hbase.zookeeper.property.clientPort","2181");
         hbaseOP.getConf().set("dfs.socket.timeout", "180000");
+        //load from properties
+        try {
+            InputStream in = new BufferedInputStream(new FileInputStream("conf/tracker.properties"));
+            Properties pro = new Properties();
+            pro.load(in);
+            if(!pro.getProperty("hbase.rootdir").equals(""))
+                hbaseOP.getConf().set("hbase.rootdir",pro.getProperty("hbase.rootdir"));
+            if(!pro.getProperty("hbase.zookeeper.quorum").equals(""))
+                hbaseOP.getConf().set("hbase.zookeeper.quorum",pro.getProperty("hbase.zookeeper.quorum"));
+            if(!pro.getProperty("hbase.zookeeper.property.clientPort").equals(""))
+                hbaseOP.getConf().set("hbase.zookeeper.property.clientPort",pro.getProperty("hbase.zookeeper.property.clientPort"));
+            if(!pro.getProperty("dfs.socket.timeout").equals(""))
+                hbaseOP.getConf().set("dfs.socket.timeout",pro.getProperty("dfs.socket.timeout"));
+        } catch (Exception e) {
+            logger.error("load the hbase conf properties failed!!!");
+            e.printStackTrace();
+        }
         //find start position
         //log comment
         logger.info("find start position");
@@ -313,7 +349,7 @@ public class Handler1 implements MagpieExecutor {
     }
 
     //Thread : take the binlog data from the mysql
-    class FetchThread extends Thread{
+    class FetchThread extends Thread {
 
         //dbsync interface
         private DirectLogFetcherChannel fetcher;
