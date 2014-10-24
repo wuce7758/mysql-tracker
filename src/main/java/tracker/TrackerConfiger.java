@@ -16,7 +16,20 @@ public class TrackerConfiger {
 
     private Long slaveId;
 
-    private String hbaseString;
+    private String hbaseRootDir;
+
+    private String hbaseDistributed;
+
+    private String hbaseZkQuorum;
+
+    private String hbaseZkPort;
+
+    private String dfsSocketTimeout;
+
+
+    public TrackerConfiger() {
+
+    }
 
     public TrackerConfiger(String username, String password, String address, int port, Long slaveId) {
         this.username = username;
@@ -32,7 +45,7 @@ public class TrackerConfiger {
         this.address = address;
         this.port = port;
         this.slaveId = slaveId;
-        this.hbaseString = hbaseString;
+        this.hbaseRootDir = hbaseString;
     }
 
 
@@ -76,12 +89,44 @@ public class TrackerConfiger {
         this.slaveId = slaveId;
     }
 
-    public String getHbaseString() {
-        return hbaseString;
+    public String getHbaseRootDir() {
+        return hbaseRootDir;
     }
 
-    public void setHbaseString(String hbaseString) {
-        this.hbaseString = hbaseString;
+    public void setHbaseRootDir(String hbaseRootDir) {
+        this.hbaseRootDir = hbaseRootDir;
+    }
+
+    public String getHbaseDistributed() {
+        return hbaseDistributed;
+    }
+
+    public void setHbaseDistributed(String hbaseDistributed) {
+        this.hbaseDistributed = hbaseDistributed;
+    }
+
+    public String getHbaseZkQuorum() {
+        return hbaseZkQuorum;
+    }
+
+    public void setHbaseZkQuorum(String hbaseZkQuorum) {
+        this.hbaseZkQuorum = hbaseZkQuorum;
+    }
+
+    public String getHbaseZkPort() {
+        return hbaseZkPort;
+    }
+
+    public void setHbaseZkPort(String hbaseZkPort) {
+        this.hbaseZkPort = hbaseZkPort;
+    }
+
+    public String getDfsSocketTimeout() {
+        return dfsSocketTimeout;
+    }
+
+    public void setDfsSocketTimeout(String dfsSocketTimeout) {
+        this.dfsSocketTimeout = dfsSocketTimeout;
     }
 
 }

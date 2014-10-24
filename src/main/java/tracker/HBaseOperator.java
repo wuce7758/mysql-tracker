@@ -33,8 +33,8 @@ public class HBaseOperator {
     private String mysqlId = "127.0.0.1:3306";
 
     //public global single rowkey for tracker and parser and per minute row key = single parser + time
-    public  String trackerRowKey = "MysqlTracker";
-    public  String parserRowKey = "MysqlParser";
+    public  String trackerRowKey = "jd-MysqlTracker";
+    public  String parserRowKey = "jd-MysqlParser";
     public  String binlogXidCol = "BinlogXid";
     public  String eventXidCol = "EventXidRowKey";
     public  String eventRowCol = "EventRowKey";
@@ -44,28 +44,13 @@ public class HBaseOperator {
     //constructor and getter and setter
     public HBaseOperator() {
         conf = HBaseConfiguration.create();
-        //import the xml configuration
-        //conf.addResource("conf/hbase-site.xml");
-        conf.set("hbase.rootdir","hdfs://localhost:9000/hbase");
-        conf.set("hbase.cluster.distributed","true");
-        conf.set("hbase.zookeeper.quorum","localhost");
-        conf.set("hbase.zookeeper.property.clientPort","2181");
-        conf.set("dfs.socket.timeout", "180000");
     }
 
     public HBaseOperator(String myId) {
         conf = HBaseConfiguration.create();
-        //import the xml configuration
-        //conf.addResource("conf/hbase-site.xml");
-        conf.set("hbase.rootdir","hdfs://localhost:9000/hbase");
-        conf.set("hbase.cluster.distributed","true");
-        conf.set("hbase.zookeeper.quorum","localhost");
-        conf.set("hbase.zookeeper.property.clientPort","2181");
-        conf.set("dfs.socket.timeout", "180000");
-
         mysqlId = myId;
-        trackerRowKey = trackerRowKey + "#" + mysqlId;
-        parserRowKey = parserRowKey + "#" + mysqlId;
+        trackerRowKey = trackerRowKey + "###" + mysqlId;
+        parserRowKey = parserRowKey + "###" + mysqlId;
     }
 
     public Configuration getConf() {

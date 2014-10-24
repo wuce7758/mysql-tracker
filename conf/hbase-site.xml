@@ -21,21 +21,53 @@
  * limitations under the License.
  */
 -->
+<!--<configuration>-->
+	<!--<property>-->
+		<!--<name>hbase.rootdir</name>-->
+		<!--<value>hdfs://localhost:9000/hbase</value>-->
+	<!--</property>-->
+	<!--<property>-->
+		<!--<name>hbase.cluster.distributed</name>-->
+		<!--<value>true</value>-->
+	<!--</property>-->
+	<!--<property>-->
+		<!--<name>hbase.zookeeper.quorum</name>-->
+		<!--<value>127.0.0.1</value>-->
+	<!--</property>-->
+	<!--<property>-->
+		<!--<name>hbase.zookeeper.property.clientPort</name>-->
+		<!--<value>2181</value>-->
+	<!--</property>-->
+<!--</configuration>-->
+
 <configuration>
-	<property>
-		<name>hbase.rootdir</name>
-		<value>hdfs://localhost:9000/hbase</value>
-	</property>
-	<property>
-		<name>hbase.cluster.distributed</name>
-		<value>true</value>
-	</property>
-	<property>
-		<name>hbase.zookeeper.quorum</name>
-		<value>localhost</value>
-	</property>
-	<property>
-		<name>hbase.zookeeper.property.clientPort</name>
-		<value>4180</value>
-	</property>
+<property>
+    <name>hbase.rootdir</name>
+    <value>hdfs://BJ-YZH-1-H1-3650.jd.com:9000/hbase</value>
+</property>
+<property>
+    <name>hbase.cluster.distributed</name>
+    <value>true</value>
+</property>
+<property>
+    <name>hbase.master</name>
+    <value>hdfs://BJ-YZH-1-H1-3650.jd.com:60000</value>
+</property>
+<property>
+    <name>hbase.tmp.dir</name>
+    <value>/export/jrdw/hbase_tmp</value>
+</property>
+<property>
+    <name>hbase.zookeeper.quorum</name>
+    <value>BJ-YZH-1-H1-3660.jd.com,BJ-YZH-1-H1-3661.jd.com,BJ-YZH-1-H1-3662.jd.com</value>
+</property>
+<property>
+    <name>hbase.zookeeper.property.clientPort</name>
+    <value>2181</value>
+</property>
+<property>
+    <name>hbase.zookeeper.property.dataDir</name>
+    <value>/export/jrdw/hbase_data</value>
+</property>
 </configuration>
+

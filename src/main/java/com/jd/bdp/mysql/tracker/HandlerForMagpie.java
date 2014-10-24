@@ -13,9 +13,6 @@ import driver.packets.HeaderPacket;
 import driver.packets.client.BinlogDumpCommandPacket;
 import driver.packets.server.ResultSetPacket;
 import driver.utils.PacketManager;
-import monitor.MonitorToKafkaProducer;
-import monitor.MonitorToWhaleConsumer;
-import monitor.MonitorToWhaleProducer;
 import monitor.TrackerMonitor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.KeyValue;
@@ -40,11 +37,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by hp on 14-9-22.
  */
-public class Handler1 implements MagpieExecutor {
+public class HandlerForMagpie implements MagpieExecutor {
 
 
     //tracker's log
-    private Logger logger = LoggerFactory.getLogger(Handler1.class);
+    private Logger logger = LoggerFactory.getLogger(HandlerForMagpie.class);
 
     //mysql JDBC by socket
     private MysqlConnector connector;
@@ -110,57 +107,41 @@ public class Handler1 implements MagpieExecutor {
     private List<LogEvent> eventList;
 
     //fetchMonitor
-    private TrackerMonitor fetchMonitor;
-    private TrackerMonitor persistenceMonitor;
-    //private MonitorToWhaleProducer whaleMonitorProducer;
-    //private MonitorToWhaleConsumer whaleMonitorConsumer;
-    private MonitorToKafkaProducer kafkaMonitorProducer;
-
-
-    //multiple thread
+        private TrackerMonitor fetchMonitor;
+        private TrackerMonitor persistenceMonitor;
+        //private MonitorToWhaleProducer whaleMonitorProducer;
+        //private MonitorToWhaleConsumer whaleMonitorConsumer;
+        //private MonitorToKafkaProducer kafkaMonitorProducer;
 
 
     //constructor
-    public Handler1(TrackerConfiger configer) {
+    public HandlerForMagpie(TrackerConfiger configer) {
         this.configer = configer;
     }
 
-    public Handler1(String username, String password, String address, int port, Long slaveId) {
-        configer = new TrackerConfiger(username, password, address, port, slaveId);
-    }
-
-    public Handler1(String username, String password, String address, int port, Long slaveId, String hbase) {
-        configer = new TrackerConfiger(username, password, address, port, slaveId, hbase);
-    }
-
-    public Handler1() {
-        try {
-            InputStream in = new BufferedInputStream(new FileInputStream("conf/tracker.properties"));
+    public HandlerForMagpie(File file) throws IOException{
+        if(file.exists()) {
+            InputStream in = new BufferedInputStream(new FileInputStream(file));
             Properties pro = new Properties();
             pro.load(in);
-            String sumAddress = pro.getProperty("mysql.address");
-            String[] subStrings = sumAddress.split(":");
-            String address =subStrings[0];
-            int port = Integer.parseInt(subStrings[1]);
-            String username = pro.getProperty("mysql.usr");
-            String password = pro.getProperty("mysql.psd");
-            Long slaveId = Long.valueOf(pro.getProperty("mysql.slaveId"));
-            String hbase = pro.getProperty("hbase.rootdir");
-            configer = new TrackerConfiger(username, password, address, port, slaveId, hbase);
-        } catch (Exception e) {
-            logger.error("load the mysql conf properties failed!!!");
-            e.printStackTrace();
+            configer = new TrackerConfiger();
+            configer.setAddress(pro.getProperty("mysql.address"));
+            configer.setPort(Integer.valueOf(pro.getProperty("mysql.port")));
+            configer.setUsername(pro.getProperty("mysql.usr"));
+            configer.setPassword(pro.getProperty("mysql.psd"));
+            configer.setSlaveId(Long.valueOf(pro.getProperty("mysql.slaveId")));
+            configer.setHbaseRootDir(pro.getProperty("hbase.rootdir"));
+            configer.setHbaseDistributed(pro.getProperty("hbase.cluster.distributed"));
+            configer.setHbaseZkQuorum(pro.getProperty("hbase.zookeeper.quorum"));
+            configer.setHbaseZkPort(pro.getProperty("hbase.zookeeper.property.clientPort"));
+            configer.setDfsSocketTimeout(pro.getProperty("dfs.socket.timeout"));
+        } else {
+            logger.error("properties file is not found !!! can not load the task!!!");
+            System.exit(1);
         }
     }
 
-
-
-
     public void prepare(String id) throws Exception {
-
-        //initialize config
-        //configer = new TrackerConfiger("canal","canal","192.168.213.41",3306,Long.valueOf(7777));
-
         //log comment
         logger.info("starting the  tracker ......");
         //initialize the connector and executor
@@ -192,30 +173,12 @@ public class Handler1 implements MagpieExecutor {
         queryExecutor = new MysqlQueryExecutor(connector);
         updateExecutor = new MysqlUpdateExecutor(connector);
         //hbase operator
-        hbaseOP = new HBaseOperator(configer.getAddress() + ":" + configer.getPort() +
-        "," + configer.getHbaseString());
-        hbaseOP.getConf().set("hbase.rootdir","hdfs://localhost:9000/hbase");
-        hbaseOP.getConf().set("hbase.cluster.distributed","true");
-        hbaseOP.getConf().set("hbase.zookeeper.quorum","localhost");
-        hbaseOP.getConf().set("hbase.zookeeper.property.clientPort","2181");
-        hbaseOP.getConf().set("dfs.socket.timeout", "180000");
-        //load from properties
-        try {
-            InputStream in = new BufferedInputStream(new FileInputStream("conf/tracker.properties"));
-            Properties pro = new Properties();
-            pro.load(in);
-            if(!pro.getProperty("hbase.rootdir").equals(""))
-                hbaseOP.getConf().set("hbase.rootdir",pro.getProperty("hbase.rootdir"));
-            if(!pro.getProperty("hbase.zookeeper.quorum").equals(""))
-                hbaseOP.getConf().set("hbase.zookeeper.quorum",pro.getProperty("hbase.zookeeper.quorum"));
-            if(!pro.getProperty("hbase.zookeeper.property.clientPort").equals(""))
-                hbaseOP.getConf().set("hbase.zookeeper.property.clientPort",pro.getProperty("hbase.zookeeper.property.clientPort"));
-            if(!pro.getProperty("dfs.socket.timeout").equals(""))
-                hbaseOP.getConf().set("dfs.socket.timeout",pro.getProperty("dfs.socket.timeout"));
-        } catch (Exception e) {
-            logger.error("load the hbase conf properties failed!!!");
-            e.printStackTrace();
-        }
+        hbaseOP = new HBaseOperator(id);
+        hbaseOP.getConf().set("hbase.rootdir",configer.getHbaseRootDir());
+        hbaseOP.getConf().set("hbase.cluster.distributed",configer.getHbaseDistributed());
+        hbaseOP.getConf().set("hbase.zookeeper.quorum",configer.getHbaseZkQuorum());
+        hbaseOP.getConf().set("hbase.zookeeper.property.clientPort",configer.getHbaseZkPort());
+        hbaseOP.getConf().set("dfs.socket.timeout", configer.getDfsSocketTimeout());
         //find start position
         //log comment
         logger.info("find start position");
@@ -247,12 +210,12 @@ public class Handler1 implements MagpieExecutor {
         //fetchMonitor initialize
         fetchMonitor = new TrackerMonitor();
         persistenceMonitor = new TrackerMonitor();
-//        whaleMonitorProducer = new MonitorToWhaleProducer();
-//        whaleMonitorProducer.open();
-//        whaleMonitorConsumer = new MonitorToWhaleConsumer();
-//        whaleMonitorConsumer.open();
-        kafkaMonitorProducer = new MonitorToKafkaProducer();
-        kafkaMonitorProducer.open();
+////        whaleMonitorProducer = new MonitorToWhaleProducer();
+////        whaleMonitorProducer.open();
+////        whaleMonitorConsumer = new MonitorToWhaleConsumer();
+////        whaleMonitorConsumer.open();
+//        kafkaMonitorProducer = new MonitorToKafkaProducer();
+//        kafkaMonitorProducer.open();
 
         //log
         logger.info("tracker is started successfully......");
@@ -328,7 +291,7 @@ public class Handler1 implements MagpieExecutor {
                 Calendar cal = Calendar.getInstance();
                 DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                 String time = sdf.format(cal.getTime());
-                String rowKey = hbaseOP.trackerRowKey + ":" + time;
+                String rowKey = hbaseOP.trackerRowKey + "##" + time;
                 Put put = new Put(Bytes.toBytes(rowKey));
                 String xidValue = globalBinlogName + ":" + globalXidEvent.getLogPos();
                 Long xidEventRowLong = Bytes.toLong(globalXidEventRowKey);
@@ -394,7 +357,7 @@ public class Handler1 implements MagpieExecutor {
                             logger.error("eventQueue and entryQueue add data failed!!!");
                             throw new InterruptedIOException();
                         }
-                        //fetchMonitor update
+//                        //fetchMonitor update
                         fetchMonitor.inEventNum++;
                         fetchMonitor.inSizeEvents += event.getEventLen(); //bit unit
                         if (fetchMonitor.inEventNum == 1) {
@@ -407,33 +370,22 @@ public class Handler1 implements MagpieExecutor {
                             fetchMonitor.endTimeDate = new Date();
                             fetchMonitor.duringDealTime = fetchMonitor.endDealTime - fetchMonitor.startDealTime;
                             if (fetchMonitor.inEventNum > 0) {
-                            /*logger.info(":::::::::::::::::::::::::::::::::::::::::::MONITOR : fetch data : count -> " +
-                                            fetchMonitor.inEventNum +
-                                            ",size(event length) -> " +
-                                            fetchMonitor.inSizeEvents +
-                                            ",start time -> " +
-                                            fetchMonitor.startTimeDate +
-                                            ",end time -> " +
-                                            fetchMonitor.endTimeDate +
-                                            ",during time -> " +
-                                            fetchMonitor.duringDealTime
-                            );*/
                                 //whale monitor
-                                try {
-//                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.inEventNum));
-//                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.inSizeEvents));
-//                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.startTimeDate));
-//                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.endTimeDate));
-//                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.duringDealTime));
-                                    String key = "tracker:" + new Date();
-                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.inEventNum));
-                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.inSizeEvents));
-                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.startTimeDate));
-                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.endTimeDate));
-                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.duringDealTime));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+//                                try {
+////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.inEventNum));
+////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.inSizeEvents));
+////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.startTimeDate));
+////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.endTimeDate));
+////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.duringDealTime));
+//                                    String key = "tracker:" + new Date();
+//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.inEventNum));
+//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.inSizeEvents));
+//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.startTimeDate));
+//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.endTimeDate));
+//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.duringDealTime));
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
                             }
                             //after fetchMonitor
                             fetchMonitor.clear();
@@ -564,7 +516,7 @@ public class Handler1 implements MagpieExecutor {
 
 //        whaleMonitorProducer.close();
 //        whaleMonitorConsumer.close();
-        kafkaMonitorProducer.close();
+        //kafkaMonitorProducer.close();
     }
 
 
@@ -626,33 +578,22 @@ public class Handler1 implements MagpieExecutor {
             persistenceMonitor.endTimeDate = new Date();
             persistenceMonitor.duringDealTime = persistenceMonitor.endDealTime - persistenceMonitor.startDealTime;
             if(persistenceMonitor.outEventNum > 0) {
-                /*logger.info(":::::::::::::::::::::::::::::::::::::::::::::::::MONITOR : persistences data : count -> " +
-                                persistenceMonitor.outEventNum +
-                                ",size(event length) -> " +
-                                persistenceMonitor.outSizeEvents +
-                                ",start time -> " +
-                                persistenceMonitor.startTimeDate +
-                                ",end time -> " +
-                                persistenceMonitor.endTimeDate +
-                                ",during time -> " +
-                                persistenceMonitor.duringDealTime
-                );*/
                 //whale monitor
-                try {
-//                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.outEventNum));
-//                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.outSizeEvents));
-//                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.startTimeDate));
-//                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.endTimeDate));
-//                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.duringDealTime));
-                    String key = "tracker:" + new Date();
-                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.outEventNum));
-                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.outSizeEvents));
-                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.startTimeDate));
-                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.endTimeDate));
-                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.duringDealTime));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {
+////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.outEventNum));
+////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.outSizeEvents));
+////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.startTimeDate));
+////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.endTimeDate));
+////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.duringDealTime));
+//                    String key = "tracker:" + new Date();
+//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.outEventNum));
+//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.outSizeEvents));
+//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.startTimeDate));
+//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.endTimeDate));
+//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.duringDealTime));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
             //after monitor
             persistenceMonitor.clear();

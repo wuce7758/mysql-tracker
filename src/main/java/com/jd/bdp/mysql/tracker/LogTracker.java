@@ -1,6 +1,7 @@
 package com.jd.bdp.mysql.tracker;
 
 import com.jd.bdp.magpie.Topology;
+import tracker.TrackerConfiger;
 
 /**
  * Created by hp on 14-9-22.
@@ -8,9 +9,18 @@ import com.jd.bdp.magpie.Topology;
 public class LogTracker {
 
     public static void main(String[] args) throws Exception {
-        //Handler handler = new Handler("canal","canal","192.168.213.41",3306,Long.valueOf(7777));
-        //Handler1 handler = new Handler1("canal","canal","127.0.0.1",3306,Long.valueOf(2234),"localhost:9000/hbase");
-        Handler1 handler = new Handler1();
+        TrackerConfiger cnf = new TrackerConfiger();
+        cnf.setUsername("jd_data");
+        cnf.setPassword("jd_data");
+        cnf.setAddress("172.17.36.48");
+        cnf.setPort(3306);
+        cnf.setSlaveId(Long.valueOf(2234));
+        cnf.setHbaseRootDir("hdfs://BJ-YZH-1-H1-3650.jd.com:9000/hbase");
+        cnf.setHbaseDistributed("true");
+        cnf.setHbaseZkQuorum("BJ-YZH-1-H1-3660.jd.com,BJ-YZH-1-H1-3661.jd.com,BJ-YZH-1-H1-3662.jd.com");
+        cnf.setHbaseZkPort("2181");
+        cnf.setDfsSocketTimeout("180000");
+        HandlerForMagpie handler = new HandlerForMagpie(cnf);
         Topology topology = new Topology(handler);
         topology.run();
     }

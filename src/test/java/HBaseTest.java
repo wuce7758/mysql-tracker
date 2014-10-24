@@ -39,14 +39,15 @@ public class HBaseTest {
     public static Configuration configuration;
     static {
         configuration = HBaseConfiguration.create();
+        //configuration.addResource("conf/hbase-site.xml");
         configuration.set("hbase.zookeeper.property.clientPort", "2181");
         configuration.set("hbase.zookeeper.quorum", "127.0.0.1");
-        configuration.set("hbase.rootdir", "hdfs://localhost:9000/hbase");
+        configuration.set("hbase.master", "hdfs://localhost:9000/hbase");
     }
 
     public static void main(String[] args) throws IOException{
-        //createTable("wujintao");
-         //insertData("wujintao");
+        createTable("wujintao");
+         insertData("wujintao");
          QueryAll("wujintao");
         // QueryByCondition1("wujintao");
         // QueryByCondition2("wujintao");
