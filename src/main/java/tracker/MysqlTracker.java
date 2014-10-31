@@ -11,7 +11,7 @@ import driver.packets.client.BinlogDumpCommandPacket;
 import driver.packets.server.ResultSetPacket;
 import driver.utils.PacketManager;
 import org.apache.commons.lang.StringUtils;
-import org.jruby.RubyProcess;
+//import org.jruby.RubyProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
