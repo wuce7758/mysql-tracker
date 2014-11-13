@@ -14,6 +14,7 @@ import driver.packets.client.BinlogDumpCommandPacket;
 import driver.packets.server.ResultSetPacket;
 import driver.utils.PacketManager;
 import monitor.TrackerMonitor;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Get;
@@ -142,6 +143,24 @@ public class HandlerForMagpie implements MagpieExecutor {
     }
 
     public void prepare(String id) throws Exception {
+
+
+
+        //adjust the config
+        MagpieConfigJson configJson = new MagpieConfigJson(id);
+        JSONObject jRoot = configJson.getJson();
+        JSONObject jContent = jRoot.getJSONObject("info").getJSONObject("content");
+        configer.setUsername(jContent.getString("Username"));
+        configer.setPassword(jContent.getString("Password"));
+        configer.setAddress(jContent.getString("Address"));
+        configer.setPort(jContent.getInt("Port"));
+        configer.setSlaveId(jContent.getLong("SlaveId"));
+        configer.setHbaseRootDir(jContent.getString("HbaseRootDir"));
+        configer.setHbaseDistributed(jContent.getString("HbaseDistributed"));
+        configer.setHbaseZkQuorum(jContent.getString("HbaseZKQuorum"));
+        configer.setHbaseZkPort(jContent.getString("HbaseZKPort"));
+        configer.setDfsSocketTimeout(jContent.getString("DfsSocketTimeout"));
+
         //log comment
         logger.info("starting the  tracker ......");
         //initialize the connector and executor
