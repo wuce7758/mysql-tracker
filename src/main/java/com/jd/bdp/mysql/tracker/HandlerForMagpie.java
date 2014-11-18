@@ -13,7 +13,6 @@ import driver.packets.HeaderPacket;
 import driver.packets.client.BinlogDumpCommandPacket;
 import driver.packets.server.ResultSetPacket;
 import driver.utils.PacketManager;
-import monitor.TrackerMonitor;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.KeyValue;
@@ -50,6 +49,11 @@ public class HandlerForMagpie implements MagpieExecutor {
     private MysqlQueryExecutor queryExecutor ;
 
     private MysqlUpdateExecutor updateExecutor ;
+
+    //get mysql position at real time
+    private MysqlConnector realConnector;
+
+    private MysqlQueryExecutor realQuery;
 
     //get the table structure
     private MysqlConnector connectorTable;
@@ -107,12 +111,7 @@ public class HandlerForMagpie implements MagpieExecutor {
     //run control
     private List<LogEvent> eventList;
 
-    //fetchMonitor
-        private TrackerMonitor fetchMonitor;
-        private TrackerMonitor persistenceMonitor;
-        //private MonitorToWhaleProducer whaleMonitorProducer;
-        //private MonitorToWhaleConsumer whaleMonitorConsumer;
-        //private MonitorToKafkaProducer kafkaMonitorProducer;
+
 
 
     //constructor
@@ -149,17 +148,19 @@ public class HandlerForMagpie implements MagpieExecutor {
         //adjust the config
         MagpieConfigJson configJson = new MagpieConfigJson(id);
         JSONObject jRoot = configJson.getJson();
-        JSONObject jContent = jRoot.getJSONObject("info").getJSONObject("content");
-        configer.setUsername(jContent.getString("Username"));
-        configer.setPassword(jContent.getString("Password"));
-        configer.setAddress(jContent.getString("Address"));
-        configer.setPort(jContent.getInt("Port"));
-        configer.setSlaveId(jContent.getLong("SlaveId"));
-        configer.setHbaseRootDir(jContent.getString("HbaseRootDir"));
-        configer.setHbaseDistributed(jContent.getString("HbaseDistributed"));
-        configer.setHbaseZkQuorum(jContent.getString("HbaseZKQuorum"));
-        configer.setHbaseZkPort(jContent.getString("HbaseZKPort"));
-        configer.setDfsSocketTimeout(jContent.getString("DfsSocketTimeout"));
+        if(jRoot != null) {
+            JSONObject jContent = jRoot.getJSONObject("info").getJSONObject("content");
+            configer.setUsername(jContent.getString("Username"));
+            configer.setPassword(jContent.getString("Password"));
+            configer.setAddress(jContent.getString("Address"));
+            configer.setPort(jContent.getInt("Port"));
+            configer.setSlaveId(jContent.getLong("SlaveId"));
+            configer.setHbaseRootDir(jContent.getString("HbaseRootDir"));
+            configer.setHbaseDistributed(jContent.getString("HbaseDistributed"));
+            configer.setHbaseZkQuorum(jContent.getString("HbaseZkQuorum"));
+            configer.setHbaseZkPort(jContent.getString("HbaseZkPort"));
+            configer.setDfsSocketTimeout(jContent.getString("DfsSocketTimeout"));
+        }
 
         //log comment
         logger.info("starting the  tracker ......");
@@ -172,10 +173,14 @@ public class HandlerForMagpie implements MagpieExecutor {
             connectorTable = new MysqlConnector(new InetSocketAddress(configer.getAddress(), configer.getPort()),
                     configer.getUsername(),
                     configer.getPassword());
+            realConnector = new MysqlConnector(new InetSocketAddress(configer.getAddress(), configer.getPort()),
+                    configer.getUsername(),
+                    configer.getPassword());
             //connect mysql to find start position and dump binlog
             try {
                 connector.connect();
                 connectorTable.connect();
+                realConnector.connect();
                 mysqlExist = true;
             } catch (IOException e) {
                 logger.error("connector connect failed or connectorTable connect failed");
@@ -191,6 +196,7 @@ public class HandlerForMagpie implements MagpieExecutor {
         } while(!mysqlExist);
         queryExecutor = new MysqlQueryExecutor(connector);
         updateExecutor = new MysqlUpdateExecutor(connector);
+        realQuery = new MysqlQueryExecutor(realConnector);
         //hbase operator
         hbaseOP = new HBaseOperator(id);
         hbaseOP.getConf().set("hbase.rootdir",configer.getHbaseRootDir());
@@ -225,16 +231,6 @@ public class HandlerForMagpie implements MagpieExecutor {
         //run() control
         startTime = new Date().getTime();
         eventList = new ArrayList<LogEvent>();
-
-        //fetchMonitor initialize
-        fetchMonitor = new TrackerMonitor();
-        persistenceMonitor = new TrackerMonitor();
-////        whaleMonitorProducer = new MonitorToWhaleProducer();
-////        whaleMonitorProducer.open();
-////        whaleMonitorConsumer = new MonitorToWhaleConsumer();
-////        whaleMonitorConsumer.open();
-//        kafkaMonitorProducer = new MonitorToKafkaProducer();
-//        kafkaMonitorProducer.open();
 
         //log
         logger.info("tracker is started successfully......");
@@ -280,7 +276,7 @@ public class HandlerForMagpie implements MagpieExecutor {
         return(entryPosition);
     }
 
-    //find position by mysql
+    //find position by mysql  note!!! : this function will change the variable globalEventRowKey
     private EntryPosition findMysqlStartPosition()throws IOException{
         ResultSetPacket resultSetPacket = queryExecutor.query("show master status");
         List<String> fields = resultSetPacket.getFieldValues();
@@ -304,8 +300,6 @@ public class HandlerForMagpie implements MagpieExecutor {
         public void run(){
 
             //monitor the mysql connection , is connection is invalid then close all thread
-
-
             if(globalBinlogName != null && globalXidEvent != null && globalXidEventRowKey != null) {
                 Calendar cal = Calendar.getInstance();
                 DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -349,65 +343,17 @@ public class HandlerForMagpie implements MagpieExecutor {
                 preRun();
                 while(running) {
                     while (fetcher.fetch()) {
-                        logger.info("fetch the binlog data (event) successfully...");
                         LogEvent event = decoder.decode(fetcher, context);
                         if (event == null) {
                             logger.error("fetched event is null!!!");
                             throw new NullPointerException("event is null!");
                         }
-                        logger.info("---------------->get event : " +
-                                        LogEvent.getTypeName(event.getHeader().getType()) +
-                                        ",----> now pos: " +
-                                        (event.getLogPos() - event.getEventLen()) +
-                                        ",----> next pos: " +
-                                        event.getLogPos() +
-                                        ",----> binlog file : " +
-                                        eventParser.getBinlogFileName()
-                        );
-                        if (event.getHeader().getType() == LogEvent.QUERY_EVENT) {
-                            logger.info(",----> sql : " +
-                                            ((QueryLogEvent) event).getQuery()
-                            );
-                        }
-                        //System.out.println();
+                        //add the event to the queue
                         try {
                             if (event != null) eventQueue.put(event);
                         } catch (InterruptedException e) {
                             logger.error("eventQueue and entryQueue add data failed!!!");
                             throw new InterruptedIOException();
-                        }
-//                        //fetchMonitor update
-                        fetchMonitor.inEventNum++;
-                        fetchMonitor.inSizeEvents += event.getEventLen(); //bit unit
-                        if (fetchMonitor.inEventNum == 1) {
-                            fetchMonitor.startDealTime = new Date().getTime();
-                            fetchMonitor.startTimeDate = new Date();
-                        }
-                        if (fetchMonitor.inEventNum == batchsize ||
-                                new Date().getTime() - fetchMonitor.startDealTime >= secondsize * 1000) {
-                            fetchMonitor.endDealTime = new Date().getTime();
-                            fetchMonitor.endTimeDate = new Date();
-                            fetchMonitor.duringDealTime = fetchMonitor.endDealTime - fetchMonitor.startDealTime;
-                            if (fetchMonitor.inEventNum > 0) {
-                                //whale monitor
-//                                try {
-////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.inEventNum));
-////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.inSizeEvents));
-////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.startTimeDate));
-////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.endTimeDate));
-////                                whaleMonitorProducer.send(0, String.valueOf(fetchMonitor.duringDealTime));
-//                                    String key = "tracker:" + new Date();
-//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.inEventNum));
-//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.inSizeEvents));
-//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.startTimeDate));
-//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.endTimeDate));
-//                                    kafkaMonitorProducer.send(key, String.valueOf(fetchMonitor.duringDealTime));
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-                            }
-                            //after fetchMonitor
-                            fetchMonitor.clear();
                         }
                     }
                     //fetch return false , and re connect to mysql
@@ -492,6 +438,21 @@ public class HandlerForMagpie implements MagpieExecutor {
                     }
                 }
             } while(!connectorTable.isConnected());
+            do {
+                logger.info("mysql connection is aborted ...");
+                try {
+                    realConnector.reconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(!realConnector.isConnected()) {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } while(!realConnector.isConnected());
         }
 
         private void reConfig() throws IOException{
@@ -529,39 +490,17 @@ public class HandlerForMagpie implements MagpieExecutor {
 
 
     public void close(String id) throws Exception {
-
         connector.disconnect();
         connectorTable.disconnect();
-
-//        whaleMonitorProducer.close();
-//        whaleMonitorConsumer.close();
-        //kafkaMonitorProducer.close();
     }
 
 
     public void run() throws Exception {
-        //logger.info("getting the queue data to the local list");
-        //while + sleep
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            logger.error("sleep error");
-            e.printStackTrace();
-        }
         //take the data from the queue
         while(!eventQueue.isEmpty()) {
             try {
                 LogEvent event = eventQueue.take();
                 if(event!=null) eventList.add(event);
-                //monitor update
-                if(event != null) {
-                    persistenceMonitor.outEventNum++;
-                    persistenceMonitor.outSizeEvents += event.getEventLen();
-                    if(persistenceMonitor.outEventNum == 1) {
-                        persistenceMonitor.startDealTime = new Date().getTime();
-                        persistenceMonitor.startTimeDate = new Date();
-                    }
-                }
                 //per turn do not load much data
                 if(eventList.size() >= batchsize) break;
             } catch (InterruptedException e){
@@ -592,30 +531,6 @@ public class HandlerForMagpie implements MagpieExecutor {
             //after persistence reinitialize the state
             eventList.clear();//the position is here???
             startTime = new Date().getTime();
-            //monitor update and after monitor
-            persistenceMonitor.endDealTime = new Date().getTime();
-            persistenceMonitor.endTimeDate = new Date();
-            persistenceMonitor.duringDealTime = persistenceMonitor.endDealTime - persistenceMonitor.startDealTime;
-            if(persistenceMonitor.outEventNum > 0) {
-                //whale monitor
-//                try {
-////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.outEventNum));
-////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.outSizeEvents));
-////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.startTimeDate));
-////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.endTimeDate));
-////                    whaleMonitorProducer.send(0, String.valueOf(persistenceMonitor.duringDealTime));
-//                    String key = "tracker:" + new Date();
-//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.outEventNum));
-//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.outSizeEvents));
-//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.startTimeDate));
-//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.endTimeDate));
-//                    kafkaMonitorProducer.send(key, String.valueOf(persistenceMonitor.duringDealTime));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-            }
-            //after monitor
-            persistenceMonitor.clear();
         }
 
     }
@@ -623,7 +538,9 @@ public class HandlerForMagpie implements MagpieExecutor {
     private void writeHBaseEvent() throws IOException{
         byte[] startPos = globalEventRowKey;
         List<Put> puts = new ArrayList<Put>();
+        LogEvent lastEvent = null;
         for(LogEvent event : eventList){
+            lastEvent = event;
             CanalEntry.Entry entry = null;
             try {
                 entry = eventParser.parse(event);
@@ -631,6 +548,8 @@ public class HandlerForMagpie implements MagpieExecutor {
                 logger.error("parse to entry failed!!!");
                 e.printStackTrace();
             }
+            //log monitor
+            logInfoEvent(event);
             //globalize
             globalBinlogName = eventParser.getBinlogFileName();
             if(entry!=null) {
@@ -648,6 +567,7 @@ public class HandlerForMagpie implements MagpieExecutor {
                 }
             }
         }
+        if(lastEvent != null) logInfoBatchEvent(lastEvent);
         hbaseOP.putHBaseData(puts, hbaseOP.getEventBytesSchemaName());
         //globalize, checkpoint pos record the xid event or row key ' s next pos not current pos
         globalEventRowKey = startPos;
@@ -679,5 +599,56 @@ public class HandlerForMagpie implements MagpieExecutor {
         put.add(hbaseOP.getFamily(), Bytes.toBytes(hbaseOP.binlogXidCol), Bytes.toBytes(xidValue));
         put.add(hbaseOP.getFamily(), Bytes.toBytes(hbaseOP.eventXidCol), Bytes.toBytes(xidEventRowString));
         hbaseOP.putHBaseData(put, hbaseOP.getCheckpointSchemaName());
+    }
+
+    private long getDelay(LogEvent event) {
+        return new Date().getTime() - event.getWhen();
+    }
+
+    private void logInfoBatchEvent(LogEvent lastEvent) {
+        //monitor measurement for delay time
+        if(lastEvent != null) {
+            try {
+                //monitor measurement for over stock
+                ResultSetPacket resultSetPacket = realQuery.query("show master status");
+                List<String> fields = resultSetPacket.getFieldValues();
+                if(CollectionUtils.isEmpty(fields)){
+                    throw new NullPointerException("show master status failed!");
+                }
+                //binlogXid
+                EntryPosition nowPos = new EntryPosition(fields.get(0),Long.valueOf(fields.get(1)));
+                long overStock = nowPos.getPosition() - lastEvent.getLogPos();
+                logger.info("==========================> batch over stock : " + overStock);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void logInfoEvent(LogEvent lastEvent) {
+        //monitor measurement for delay time
+        if(lastEvent != null) {
+            try {
+                long deleyTime = getDelay(lastEvent);
+                logger.info("---------------->get event : " +
+                                LogEvent.getTypeName(lastEvent.getHeader().getType()) +
+                                ",----> now pos: " +
+                                (lastEvent.getLogPos() - lastEvent.getEventLen()) +
+                                ",----> next pos: " +
+                                lastEvent.getLogPos() +
+                                ",----> binlog file : " +
+                                eventParser.getBinlogFileName() +
+                                ",----> delay time : " +
+                                deleyTime
+                );
+                if (lastEvent.getHeader().getType() == LogEvent.QUERY_EVENT) {
+                    logger.info(",----> sql : " +
+                                    ((QueryLogEvent) lastEvent).getQuery()
+                    );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
