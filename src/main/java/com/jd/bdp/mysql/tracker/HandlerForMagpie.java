@@ -432,7 +432,7 @@ public class HandlerForMagpie implements MagpieExecutor {
                 // for tracker to global
                 writeHBaseEvent();
             } catch (Exception e){
-                logger.error("persistence event list error");
+                logger.error("persistence event list error msg : " + e.getMessage());
                 e.printStackTrace();
             }
             if(existXid(eventList)){
@@ -452,7 +452,7 @@ public class HandlerForMagpie implements MagpieExecutor {
 
     }
 
-    private void writeHBaseEvent() throws IOException{
+    private void writeHBaseEvent() throws IOException {
         byte[] startPos = globalEventRowKey;
         List<Put> puts = new ArrayList<Put>();
         LogEvent lastEvent = null;
@@ -486,7 +486,7 @@ public class HandlerForMagpie implements MagpieExecutor {
                 }
             }
         }
-        if(lastEvent != null) {
+        if(lastEvent != null && lastRowEntry != null) {
             if(eventList.size() > 0)
                 logger.info("===========================================================> persistence the " + eventList.size() + " events "
                 + " the batched last column is " + getEntryCol(lastRowEntry));
