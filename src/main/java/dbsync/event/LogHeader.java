@@ -135,6 +135,7 @@ public final class LogHeader
     public LogHeader(LogBuffer buffer,
             FormatDescriptionLogEvent descriptionEvent)
     {
+
         when = buffer.getUint32();
         type = buffer.getUint8(); // dbsync.LogEvent.EVENT_TYPE_OFFSET;
         serverId = buffer.getUint32(); // dbsync.LogEvent.SERVER_ID_OFFSET;

@@ -66,12 +66,10 @@ public final class LogDecoder
             throws IOException
     {
         final int limit = buffer.limit();
-
         if (limit >= FormatDescriptionLogEvent.LOG_EVENT_HEADER_LEN)
         {
             LogHeader header = new LogHeader(buffer,
-                    context.getFormatDescription());
-
+                        context.getFormatDescription());
             final int len = header.getEventLen();
             if (limit >= len)
             {

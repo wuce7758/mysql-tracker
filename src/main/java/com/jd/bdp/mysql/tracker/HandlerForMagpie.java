@@ -1,5 +1,6 @@
 package com.jd.bdp.mysql.tracker;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.jd.bdp.magpie.MagpieExecutor;
 import dbsync.DirectLogFetcherChannel;
 import dbsync.LogContext;
@@ -77,15 +78,18 @@ public class HandlerForMagpie implements MagpieExecutor {
     // bigFetch() return
     // now by the py test we set the var is 1000
 
-    private int batchsize = 3000;
+    private int batchsize = 100000;
 
     // time threshold if batch size number is not reached then if the time is
     // now by the py test we set the var is 1.5 second
 
-    private double secondsize = 1.5;
+    private double secondsize = 1.0;
 
     //per second write the position
     private int secondPer = 60;
+
+    //static queue max size
+    private final int MAXQUEUE = 15000;
 
     //multi Thread share queue
     private BlockingQueue<LogEvent> eventQueue ;
@@ -215,7 +219,7 @@ public class HandlerForMagpie implements MagpieExecutor {
         eventParser = new LogEventConvert();
         eventParser.setTableMetaCache(tableMetaCache);
         //queue
-        eventQueue = new LinkedBlockingQueue<LogEvent>();
+        eventQueue = new LinkedBlockingQueue<LogEvent>(MAXQUEUE);
 
         //thread start
         //Thread : take the binlog data from the mysql
@@ -336,46 +340,29 @@ public class HandlerForMagpie implements MagpieExecutor {
 
         private Logger logger = LoggerFactory.getLogger(FetchThread.class);
 
-        private boolean running = true;
+        private LogEvent event;
 
         public void run()  {
             try {
                 preRun();
-                while(running) {
-                    while (fetcher.fetch()) {
-                        LogEvent event = decoder.decode(fetcher, context);
-                        if (event == null) {
-                            logger.error("fetched event is null!!!");
-                            throw new NullPointerException("event is null!");
-                        }
-                        //add the event to the queue
-                        try {
-                            if (event != null) eventQueue.put(event);
-                        } catch (InterruptedException e) {
-                            logger.error("eventQueue and entryQueue add data failed!!!");
-                            throw new InterruptedIOException();
-                        }
+                while (fetcher.fetch()) {
+                    event = decoder.decode(fetcher, context);
+                    if (event == null) {
+                        logger.warn("fetched event is null!!!");
+                        continue;
                     }
-                    //fetch return false , and re connect to mysql
-                    checkMysqlConn();
-                    reConfig();
+                    //add the event to the queue
+                    try {
+                        if (event != null) eventQueue.put(event);
+                    } catch (InterruptedException e) {
+                        logger.error("eventQueue and entryQueue add data failed!!!");
+                        throw new InterruptedIOException();
+                    }
                 }
-            } catch (IOException e){
-                logger.warn("fetch data failed!!! " + " Exception : " + e.getMessage());
+            } catch (IOException e) {
+                logger.error("fetch data failed!!! the IOException is " + e.getMessage());
                 e.printStackTrace();
-                //refind start position
-                try {
-                    startPosition = findMysqlStartPosition();
-                } catch (IOException ei) {
-                    logger.warn("refind position error!!! stop the all thread and fetch thread exit" + "," +
-                            "exception is " + ei.getMessage());
-                    ei.printStackTrace();
-                    return;
-                }
-                FetchThread refetch = new FetchThread();
-                refetch.start();
             }
-            running = false;
         }
 
         public void preRun() throws IOException {
@@ -389,76 +376,6 @@ public class HandlerForMagpie implements MagpieExecutor {
             updateExecutor.update("SET @mariadb_slave_capability='" + LogEvent.MARIA_SLAVE_CAPABILITY_MINE + "'");
             //send binlog dump packet and mysql will establish a binlog dump thread
             logger.info("send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql");
-            BinlogDumpCommandPacket binDmpPacket = new BinlogDumpCommandPacket();
-            binDmpPacket.binlogFileName = startPosition.getJournalName();
-            binDmpPacket.binlogPosition = startPosition.getPosition();
-            binDmpPacket.slaveServerId = configer.getSlaveId();
-            byte[] dmpBody = binDmpPacket.toBytes();
-            HeaderPacket dmpHeader = new HeaderPacket();
-            dmpHeader.setPacketBodyLength(dmpBody.length);
-            dmpHeader.setPacketSequenceNumber((byte) 0x00);
-            PacketManager.write(connector.getChannel(), new ByteBuffer[]{ByteBuffer.wrap(dmpHeader.toBytes()), ByteBuffer.wrap(dmpBody)});
-            //initialize the dbsync to fetch the binlog data
-            logger.info("initialize the dbsync class");
-            fetcher = new DirectLogFetcherChannel(connector.getReceiveBufferSize());
-            fetcher.start(connector.getChannel());
-            decoder = new LogDecoder(LogEvent.UNKNOWN_EVENT, LogEvent.ENUM_END_EVENT);
-            context = new LogContext();
-        }
-
-        private void checkMysqlConn() {
-            //if connection is aborted waiting and reconnect mysql
-            do {
-                logger.info("mysql connection is aborted ...");
-                try {
-                    connector.reconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(!connector.isConnected()) {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } while(!connector.isConnected());
-            do {
-                logger.info("mysql(table meta) connection is aborted ...");
-                try {
-                    connectorTable.reconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(!connectorTable.isConnected()) {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } while(!connectorTable.isConnected());
-            do {
-                logger.info("mysql connection is aborted ...");
-                try {
-                    realConnector.reconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(!realConnector.isConnected()) {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } while(!realConnector.isConnected());
-        }
-
-        private void reConfig() throws IOException{
-            startPosition = findStartPosition();
-            //error here do not updateExecutor.update() second times
-            //preRun();
             BinlogDumpCommandPacket binDmpPacket = new BinlogDumpCommandPacket();
             binDmpPacket.binlogFileName = startPosition.getJournalName();
             binDmpPacket.binlogPosition = startPosition.getPosition();
@@ -539,17 +456,19 @@ public class HandlerForMagpie implements MagpieExecutor {
         byte[] startPos = globalEventRowKey;
         List<Put> puts = new ArrayList<Put>();
         LogEvent lastEvent = null;
+        CanalEntry.Entry lastRowEntry = null;
+        CanalEntry.Entry entry = null;
         for(LogEvent event : eventList){
             lastEvent = event;
-            CanalEntry.Entry entry = null;
             try {
                 entry = eventParser.parse(event);
             } catch (Exception e){
                 logger.error("parse to entry failed!!!");
                 e.printStackTrace();
             }
+            if(entry != null && entry.getEntryType() == CanalEntry.EntryType.ROWDATA) lastRowEntry = entry;
             //log monitor
-            logInfoEvent(event);
+            //logInfoEvent(event);
             //globalize
             globalBinlogName = eventParser.getBinlogFileName();
             if(entry!=null) {
@@ -558,7 +477,7 @@ public class HandlerForMagpie implements MagpieExecutor {
                 puts.add(put);
                 //get next pos
                 startPos = Bytes.toBytes(Bytes.toLong(startPos) + 1L);
-                //update to global xid,
+                //u pdate to global xid,
                 // checkpoint pos record the xid event or row key ' s next pos not current pos
                 if(isEndEvent(event)){
                     //globalize
@@ -567,7 +486,13 @@ public class HandlerForMagpie implements MagpieExecutor {
                 }
             }
         }
-        if(lastEvent != null) logInfoBatchEvent(lastEvent);
+        if(lastEvent != null) {
+            if(eventList.size() > 0)
+                logger.info("===========================================================> persistence the " + eventList.size() + " events "
+                + " the batched last column is " + getEntryCol(lastRowEntry));
+            logInfoEvent(lastEvent);
+            logInfoBatchEvent(lastEvent);
+        }
         hbaseOP.putHBaseData(puts, hbaseOP.getEventBytesSchemaName());
         //globalize, checkpoint pos record the xid event or row key ' s next pos not current pos
         globalEventRowKey = startPos;
@@ -618,7 +543,7 @@ public class HandlerForMagpie implements MagpieExecutor {
                 //binlogXid
                 EntryPosition nowPos = new EntryPosition(fields.get(0),Long.valueOf(fields.get(1)));
                 long overStock = nowPos.getPosition() - lastEvent.getLogPos();
-                logger.info("==========================> batch over stock : " + overStock);
+                logger.info("##############> batch over stock : " + overStock);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -639,7 +564,9 @@ public class HandlerForMagpie implements MagpieExecutor {
                                 ",----> binlog file : " +
                                 eventParser.getBinlogFileName() +
                                 ",----> delay time : " +
-                                deleyTime
+                                deleyTime +
+                                ",----> type : " +
+                                getEventType(lastEvent)
                 );
                 if (lastEvent.getHeader().getType() == LogEvent.QUERY_EVENT) {
                     logger.info(",----> sql : " +
@@ -649,6 +576,34 @@ public class HandlerForMagpie implements MagpieExecutor {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private String getEntryCol(CanalEntry.Entry entry) {
+        String colValue = "";
+        try {
+            CanalEntry.RowChange rowChange = CanalEntry.RowChange.parseFrom(entry.getStoreValue());
+            if (rowChange.getRowDatasList().size() > 0) {
+                CanalEntry.RowData rowData = rowChange.getRowDatas(0);
+                if (rowData.getAfterColumnsList().size() > 0) {
+                    colValue = rowData.getAfterColumns(0).getName() + " ## " + rowData.getAfterColumns(0).getValue();
+                }
+            }
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return colValue;
+    }
+
+    private String getEventType(LogEvent event) {
+        return event.getTypeName(event.getHeader().getType());
+    }
+
+    private void delaySec(int t) {
+        try {
+            Thread.sleep(t * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
