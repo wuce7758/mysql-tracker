@@ -208,6 +208,7 @@ public class HandlerForMagpie implements MagpieExecutor {
         hbaseOP.getConf().set("hbase.zookeeper.quorum",configer.getHbaseZkQuorum());
         hbaseOP.getConf().set("hbase.zookeeper.property.clientPort",configer.getHbaseZkPort());
         hbaseOP.getConf().set("dfs.socket.timeout", configer.getDfsSocketTimeout());
+        hbaseOP.connect();
         //find start position
         //log comment
         logger.info("find start position");
@@ -409,6 +410,8 @@ public class HandlerForMagpie implements MagpieExecutor {
     public void close(String id) throws Exception {
         connector.disconnect();
         connectorTable.disconnect();
+        realConnector.disconnect();
+        hbaseOP.disconnect();
     }
 
 
