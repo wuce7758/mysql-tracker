@@ -1,54 +1,62 @@
 package monitor;
 
-import dbsync.LogEvent;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 /**
  * Created by hp on 14-9-23.
  */
 public class TrackerMonitor {
 
-    public Date startTimeDate;
+    public long fetchStart;
 
-    public Date endTimeDate;
+    public long fetchEnd;
 
-    public int inEventNum;
+    public long persistenceStart;
 
-    public int outEventNum;
+    public long persistenceEnd;
 
-    public int inSizeEvents;
+    public long perMinStart;
 
-    public int outSizeEvents;
+    public long perMinEnd;
 
-    public long startDealTime;
+    public long hbaseReadStart;
 
-    public long endDealTime;
+    public long hbaseReadEnd;
 
-    public long duringDealTime;
+    public long hbaseWriteStart;
 
-    public List<LogEvent> inEventList;
+    public long hbaseWriteEnd;
 
-    public List<LogEvent> outEventList;
+    public long serializeStart;
+
+    public long serializeEnd;
+
+    public long fetchNum;
+
+    public long persisNum;
+
+    public long batchSize;//bytes for unit
+
+    public long fetcherStart;
+
+    public long fetcherEnd;
+
+    public long decodeStart;
+
+    public long decodeEnd;
 
     public TrackerMonitor() {
-        startTimeDate = null;
-        endTimeDate = null;
-        inEventNum = outEventNum = inSizeEvents = outSizeEvents =  0;
-        duringDealTime = startDealTime = endDealTime = 0L;
-        inEventList = new ArrayList<LogEvent>();
-        outEventList = new ArrayList<LogEvent>();
+        fetchStart = fetchEnd = persistenceStart = persistenceEnd = 0;
+        perMinStart = perMinEnd = hbaseReadStart = hbaseReadEnd = 0;
+        hbaseWriteStart = hbaseWriteEnd = serializeStart = serializeEnd = 0;
+        fetchNum = persisNum = batchSize = 0;
+        fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
     }
 
     public void clear() {
-        startTimeDate = null;
-        endTimeDate = null;
-        inEventNum = outEventNum = inSizeEvents = outSizeEvents =  0;
-        duringDealTime = startDealTime = endDealTime = 0L;
-        inEventList = new ArrayList<LogEvent>();
-        outEventList = new ArrayList<LogEvent>();
+        fetchStart = fetchEnd = persistenceStart = persistenceEnd = 0;
+        perMinStart = perMinEnd = hbaseReadStart = hbaseReadEnd = 0;
+        hbaseWriteStart = hbaseWriteEnd = serializeStart = serializeEnd = 0;
+        fetchNum = persisNum = batchSize = 0;
+        fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
     }
 
 }

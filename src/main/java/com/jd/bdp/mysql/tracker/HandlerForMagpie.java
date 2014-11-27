@@ -14,6 +14,7 @@ import driver.packets.HeaderPacket;
 import driver.packets.client.BinlogDumpCommandPacket;
 import driver.packets.server.ResultSetPacket;
 import driver.utils.PacketManager;
+import monitor.TrackerMonitor;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.KeyValue;
@@ -89,7 +90,7 @@ public class HandlerForMagpie implements MagpieExecutor {
     private int secondPer = 60;
 
     //static queue max size
-    private final int MAXQUEUE = 15000;
+    private final int MAXQUEUE = 30000;
 
     //multi Thread share queue
     private BlockingQueue<LogEvent> eventQueue ;
@@ -114,6 +115,9 @@ public class HandlerForMagpie implements MagpieExecutor {
 
     //run control
     private List<LogEvent> eventList;
+
+    //monitor
+    private TrackerMonitor monitor;
 
 
 
@@ -237,6 +241,9 @@ public class HandlerForMagpie implements MagpieExecutor {
         startTime = new Date().getTime();
         eventList = new ArrayList<LogEvent>();
 
+        //monitor
+        monitor = new TrackerMonitor();
+
         //log
         logger.info("tracker is started successfully......");
     }
@@ -303,7 +310,6 @@ public class HandlerForMagpie implements MagpieExecutor {
 
         @Override
         public void run(){
-
             //monitor the mysql connection , is connection is invalid then close all thread
             if(globalBinlogName != null && globalXidEvent != null && globalXidEventRowKey != null) {
                 Calendar cal = Calendar.getInstance();
@@ -322,9 +328,9 @@ public class HandlerForMagpie implements MagpieExecutor {
                     logger.error("per minute persistence failed!!!");
                     e.printStackTrace();
                 }
-                logger.info("per minute persistence the binlog xid and event xid to checkpoint... " +
-                            ",row kye is " + rowKey +
-                            ",col is :" + xidValue + "; col is :" + xidEventRowString);
+                logger.info("======> per minute persistence the binlog xid and event xid to checkpoint : ");
+                logger.info("---> row kye is " + rowKey +
+                        ",col is :" + xidValue + "; col is :" + xidEventRowString);
             }
         }
     }
@@ -343,21 +349,36 @@ public class HandlerForMagpie implements MagpieExecutor {
 
         private LogEvent event;
 
+        private TrackerMonitor monitor = new TrackerMonitor();
+
         public void run()  {
             try {
                 preRun();
+                int counter = 0;
                 while (fetcher.fetch()) {
+                    if(counter == 0) monitor.fetchStart = System.currentTimeMillis();
                     event = decoder.decode(fetcher, context);
                     if (event == null) {
                         logger.warn("fetched event is null!!!");
                         continue;
                     }
+                    counter++;
+                    monitor.batchSize += event.getEventLen();
                     //add the event to the queue
                     try {
                         if (event != null) eventQueue.put(event);
                     } catch (InterruptedException e) {
                         logger.error("eventQueue and entryQueue add data failed!!!");
                         throw new InterruptedIOException();
+                    }
+                    if(counter % 10000 == 0) {
+                        monitor.fetchEnd = System.currentTimeMillis();
+                        logger.info("======> fetch thread : ");
+                        logger.info("---> fetch during time : " + (monitor.fetchEnd - monitor.fetchStart));
+                        logger.info("---> fetch number : " + counter);
+                        logger.info("---> fetch sum size : " + monitor.batchSize);
+                        monitor.clear();
+                        counter = 0;
                     }
                 }
             } catch (IOException e) {
@@ -429,6 +450,7 @@ public class HandlerForMagpie implements MagpieExecutor {
         }
         //persistence the batch size event data to event table
         if ((eventList.size() >= batchsize || new Date().getTime() - startTime > secondsize * 1000) ) {
+            monitor.persisNum = eventList.size();
             try {
                 //logger.info("persistence the entry list data to the local disk");
                 //read the start pos by global and write the new start pos of event row key
@@ -452,7 +474,14 @@ public class HandlerForMagpie implements MagpieExecutor {
             eventList.clear();//the position is here???
             startTime = new Date().getTime();
         }
-
+        monitor.persistenceEnd = System.currentTimeMillis();
+        if(monitor.persisNum > 0) {
+            logger.info("---> persistence deal during time : " + (monitor.persistenceEnd - monitor.persistenceStart));
+            logger.info("---> write hbase during time : " + (monitor.hbaseWriteEnd - monitor.hbaseWriteStart));
+            logger.info("---> entry list to bytes sum size is " + monitor.batchSize);
+            logger.info("---> the number if entry list is " + monitor.persisNum);
+            monitor.clear();
+        }
     }
 
     private void writeHBaseEvent() throws IOException {
@@ -461,6 +490,7 @@ public class HandlerForMagpie implements MagpieExecutor {
         LogEvent lastEvent = null;
         CanalEntry.Entry lastRowEntry = null;
         CanalEntry.Entry entry = null;
+        monitor.persistenceStart = System.currentTimeMillis();
         for(LogEvent event : eventList){
             lastEvent = event;
             try {
@@ -476,7 +506,9 @@ public class HandlerForMagpie implements MagpieExecutor {
             globalBinlogName = eventParser.getBinlogFileName();
             if(entry!=null) {
                 Put put = new Put(startPos);
-                put.add(hbaseOP.getFamily(), Bytes.toBytes(hbaseOP.eventBytesCol), entry.toByteArray());
+                byte[] entryBytes = entry.toByteArray();
+                monitor.batchSize += entryBytes.length;
+                put.add(hbaseOP.getFamily(), Bytes.toBytes(hbaseOP.eventBytesCol), entryBytes);
                 puts.add(put);
                 //get next pos
                 startPos = Bytes.toBytes(Bytes.toLong(startPos) + 1L);
@@ -489,14 +521,17 @@ public class HandlerForMagpie implements MagpieExecutor {
                 }
             }
         }
+        monitor.persistenceEnd = System.currentTimeMillis();
         if(lastEvent != null && lastRowEntry != null) {
             if(eventList.size() > 0)
-                logger.info("===========================================================> persistence the " + eventList.size() + " events "
+                logger.info("======> persistence the " + eventList.size() + " events "
                 + " the batched last column is " + getEntryCol(lastRowEntry));
             logInfoEvent(lastEvent);
             logInfoBatchEvent(lastEvent);
         }
+        monitor.hbaseWriteStart = System.currentTimeMillis();
         hbaseOP.putHBaseData(puts, hbaseOP.getEventBytesSchemaName());
+        monitor.hbaseWriteEnd = System.currentTimeMillis();
         //globalize, checkpoint pos record the xid event or row key ' s next pos not current pos
         globalEventRowKey = startPos;
     }
@@ -546,7 +581,7 @@ public class HandlerForMagpie implements MagpieExecutor {
                 //binlogXid
                 EntryPosition nowPos = new EntryPosition(fields.get(0),Long.valueOf(fields.get(1)));
                 long overStock = nowPos.getPosition() - lastEvent.getLogPos();
-                logger.info("##############> batch over stock : " + overStock);
+                logger.info("---> batch over stock : " + overStock);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -558,21 +593,21 @@ public class HandlerForMagpie implements MagpieExecutor {
         if(lastEvent != null) {
             try {
                 long deleyTime = getDelay(lastEvent);
-                logger.info("---------------->get event : " +
+                logger.info("--->get event : " +
                                 LogEvent.getTypeName(lastEvent.getHeader().getType()) +
-                                ",----> now pos: " +
+                                ", now pos: " +
                                 (lastEvent.getLogPos() - lastEvent.getEventLen()) +
-                                ",----> next pos: " +
+                                ", next pos: " +
                                 lastEvent.getLogPos() +
-                                ",----> binlog file : " +
+                                ", binlog file : " +
                                 eventParser.getBinlogFileName() +
-                                ",----> delay time : " +
+                                ", delay time : " +
                                 deleyTime +
-                                ",----> type : " +
+                                ", type : " +
                                 getEventType(lastEvent)
                 );
                 if (lastEvent.getHeader().getType() == LogEvent.QUERY_EVENT) {
-                    logger.info(",----> sql : " +
+                    logger.info(", sql : " +
                                     ((QueryLogEvent) lastEvent).getQuery()
                     );
                 }
