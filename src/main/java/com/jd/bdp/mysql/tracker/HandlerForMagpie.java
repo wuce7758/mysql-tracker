@@ -18,6 +18,7 @@ import monitor.TrackerMonitor;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.KeyValue;
+import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -119,6 +120,16 @@ public class HandlerForMagpie implements MagpieExecutor {
     //monitor
     private TrackerMonitor monitor;
 
+    //thread
+    FetchThread takeData;
+    PerminTimer minTask;
+    Timer timer;
+
+    //record job id
+    private String jobId;
+
+    //global thread communicate
+    private int globalFetchThread = 0;
 
 
 
@@ -150,9 +161,8 @@ public class HandlerForMagpie implements MagpieExecutor {
     }
 
     public void prepare(String id) throws Exception {
-
-
-
+        //job id
+        jobId = id;
         //adjust the config
         MagpieConfigJson configJson = new MagpieConfigJson(id);
         JSONObject jRoot = configJson.getJson();
@@ -229,12 +239,13 @@ public class HandlerForMagpie implements MagpieExecutor {
         //thread start
         //Thread : take the binlog data from the mysql
         logger.info("start the tracker thread to dump the binlog data from mysql...");
-        FetchThread takeData = new FetchThread();
+        globalFetchThread = 0;
+        takeData = new FetchThread();
         takeData.start();
         //Thread :  per minute get the event
         logger.info("start the minute thread to save the position per minute as checkpoint...");
-        PerminTimer minTask = new PerminTimer();
-        Timer timer = new Timer();
+        minTask = new PerminTimer();
+        timer = new Timer();
         timer.schedule(minTask, 1000, secondPer * 1000);
 
         //run() control
@@ -351,7 +362,7 @@ public class HandlerForMagpie implements MagpieExecutor {
 
         private TrackerMonitor monitor = new TrackerMonitor();
 
-        public void run()  {
+        public void run() {
             try {
                 preRun();
                 int counter = 0;
@@ -384,6 +395,17 @@ public class HandlerForMagpie implements MagpieExecutor {
             } catch (IOException e) {
                 logger.error("fetch data failed!!! the IOException is " + e.getMessage());
                 e.printStackTrace();
+                String errMsg = e.getMessage();
+                if(errMsg.contains("errno = 1236")) {// the position or logfile error, reset the position to show master status
+                    Delete del = new Delete(Bytes.toBytes(hbaseOP.trackerRowKey));
+                    try {
+                        hbaseOP.deleteHBaseData(del,hbaseOP.getCheckpointSchemaName());
+                        close(jobId);
+                    } catch (Exception e1) {
+                        logger.error("delete the checkpoint row key failed ...... msg : " + e1.getMessage());
+                    }
+                    globalFetchThread = 1;
+                }
             }
         }
 
@@ -429,7 +451,9 @@ public class HandlerForMagpie implements MagpieExecutor {
 
 
     public void close(String id) throws Exception {
-        connector.disconnect();
+        minTask.cancel();
+        timer.cancel();
+        connector.disconnect();//stop the fetch thread the fetch data must stop
         connectorTable.disconnect();
         realConnector.disconnect();
         hbaseOP.disconnect();
@@ -437,6 +461,11 @@ public class HandlerForMagpie implements MagpieExecutor {
 
 
     public void run() throws Exception {
+        //check the fetch thread's  status
+        if(globalFetchThread == 1) {
+            globalFetchThread = 0;
+            throw new Exception("restart the magpie executor !!! ");
+        }
         //take the data from the queue
         while(!eventQueue.isEmpty()) {
             try {
