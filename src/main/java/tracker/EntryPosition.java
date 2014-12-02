@@ -2,7 +2,17 @@ package tracker;
 
 //import org.apache.hadoop.hbase.avro.generated.HBase;
 
+import dbsync.DirectLogFetcherChannel;
+import dbsync.LogEvent;
+import driver.MysqlConnector;
+import driver.MysqlUpdateExecutor;
+import driver.packets.HeaderPacket;
+import driver.packets.client.BinlogDumpCommandPacket;
+import driver.utils.PacketManager;
+
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +22,16 @@ import java.util.List;
 public class EntryPosition {
 
 
+    public String address;
+
+    public int port;
+
+    public String username;
+
+    public String password;
+
+    //test slaveId
+    private long slaveId = 987901;
 
     //当前位点offset 所在的 binlog 文件名
     private String journalName ;
@@ -56,6 +76,15 @@ public class EntryPosition {
     public EntryPosition(String journalName, Long position) {
         this.journalName = journalName;
         this.position = position;
+    }
+
+    public EntryPosition(String journalName, Long position, String ads, int pot, String usr, String pas ) {
+        this.journalName = journalName;
+        this.position = position;
+        this.address = ads;
+        this.port = pot;
+        this.username = usr;
+        this.password = pas;
     }
 
     public String getMinuteBinlogFileName() {
@@ -265,6 +294,37 @@ public class EntryPosition {
             bw.newLine();
             bw.flush();
             bw.close();
+        }
+    }
+
+    public boolean isValidPos() {
+        try {
+            MysqlConnector connector = new MysqlConnector(new InetSocketAddress(address, port), username, password);
+            MysqlUpdateExecutor updateExecutor = new MysqlUpdateExecutor(connector);
+            DirectLogFetcherChannel fetcher = new DirectLogFetcherChannel(connector.getReceiveBufferSize());
+            updateExecutor.update("set wait_timeout=9999999");
+            updateExecutor.update("set net_write_timeout=1800");
+            updateExecutor.update("set net_read_timeout=1800");
+            updateExecutor.update("set names 'binary'");//this will be my try to test no binary
+            updateExecutor.update("set @master_binlog_checksum= '@@global.binlog_checksum'");
+            updateExecutor.update("SET @mariadb_slave_capability='" + LogEvent.MARIA_SLAVE_CAPABILITY_MINE + "'");
+            BinlogDumpCommandPacket binDmpPacket = new BinlogDumpCommandPacket();
+            binDmpPacket.binlogFileName = journalName;
+            binDmpPacket.binlogPosition = position;
+            binDmpPacket.slaveServerId = slaveId;
+            byte[] dmpBody = binDmpPacket.toBytes();
+            HeaderPacket dmpHeader = new HeaderPacket();
+            dmpHeader.setPacketBodyLength(dmpBody.length);
+            dmpHeader.setPacketSequenceNumber((byte) 0x00);
+            PacketManager.write(connector.getChannel(), new ByteBuffer[]{ByteBuffer.wrap(dmpHeader.toBytes()), ByteBuffer.wrap(dmpBody)});
+            fetcher.start(connector.getChannel());
+            fetcher.fetch();
+            fetcher.close();
+            connector.disconnect();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

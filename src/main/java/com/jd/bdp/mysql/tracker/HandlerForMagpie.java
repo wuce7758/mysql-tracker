@@ -131,6 +131,9 @@ public class HandlerForMagpie implements MagpieExecutor {
     //global thread communicate
     private int globalFetchThread = 0;
 
+    //filter
+    private FilterMatcher fm;
+
 
 
     //constructor
@@ -257,6 +260,9 @@ public class HandlerForMagpie implements MagpieExecutor {
 
         //log
         logger.info("tracker is started successfully......");
+
+        //filter
+        fm = new FilterMatcher(configer.getFilterRegex());
     }
 
 
@@ -524,6 +530,8 @@ public class HandlerForMagpie implements MagpieExecutor {
             lastEvent = event;
             try {
                 entry = eventParser.parse(event);
+                //filter
+                if(!fm.isMatch(entry.getHeader().getSchemaName() + "." + entry.getHeader().getTableName())) continue;
             } catch (Exception e){
                 logger.error("parse to entry failed!!!");
                 e.printStackTrace();

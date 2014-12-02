@@ -26,6 +26,8 @@ public class TrackerConfiger {
 
     private String dfsSocketTimeout;
 
+    private String filterRegex = ".*\\..*";
+
 
     public TrackerConfiger() {
 
@@ -48,6 +50,23 @@ public class TrackerConfiger {
         this.hbaseRootDir = hbaseString;
     }
 
+    public TrackerConfiger(String username, String password, String address, int port, Long slaveId, String hbaseString, String regex) {
+        this.username = username;
+        this.password = password;
+        this.address = address;
+        this.port = port;
+        this.slaveId = slaveId;
+        this.hbaseRootDir = hbaseString;
+        this.filterRegex = regex;
+    }
+
+    public String getFilterRegex() {
+        return filterRegex;
+    }
+
+    public void setFilterRegex(String filterRegex) {
+        this.filterRegex = filterRegex;
+    }
 
     public String getUsername() {
         return username;
