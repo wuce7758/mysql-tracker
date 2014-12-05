@@ -21,7 +21,7 @@ public class LocalLogTracker {
         cnf.setHbaseZkQuorum("127.0.0.1");
         cnf.setHbaseZkPort("2181");
         cnf.setDfsSocketTimeout("180000");
-        HandlerForMagpie handler = new HandlerForMagpie(cnf);
+        HandlerNoParserMagpie handler = new HandlerNoParserMagpie(cnf);
         Topology topology = new Topology(handler);
         topology.run();
     }
