@@ -1,5 +1,5 @@
-import tracker.CanalEntry;
-import tracker.EntryPrinter;
+import protocol.protobuf.CanalEntry;
+import tracker.utils.EntryPrinter;
 import tracker.MysqlTracker;
 
 import java.io.BufferedReader;

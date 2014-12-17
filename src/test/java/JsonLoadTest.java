@@ -1,6 +1,6 @@
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONTokener;
-import tracker.TrackerConfiger;
+import tracker.utils.TrackerConfiger;
 
 /**
  * Created by hp on 14-11-13.

@@ -1,0 +1,212 @@
+2014-12-17 13:36:49 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 13:36:49 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 13:36:49 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 13:36:49 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 13:36:49 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:17346:42:0
+2014-12-17 13:36:49 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 13:36:49 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 13:36:50 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 13:36:50 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000167,position is :21106; batch id is :73,in batch id is :0
+2014-12-17 13:36:51 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 13:36:51 HandlerMagpieKafka [INFO] ---> persistence deal during time:3
+2014-12-17 13:36:51 HandlerMagpieKafka [INFO] ---> write kafka during time:273
+2014-12-17 13:36:51 HandlerMagpieKafka [INFO] ---> the number of entry list: 64
+2014-12-17 13:36:51 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 5328
+2014-12-17 13:37:36 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 13:37:36 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 13:37:36 HandlerMagpieKafka [INFO] ---> write kafka during time:7
+2014-12-17 13:37:36 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-17 13:37:36 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 108
+2014-12-17 13:37:50 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 13:37:50 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000168,position is :191; batch id is :74,in batch id is :0
+2014-12-17 15:05:15 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 15:05:16 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 15:05:16 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 15:05:16 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 15:05:16 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:3498:104:0
+2014-12-17 15:05:16 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 15:05:17 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 15:05:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:05:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:06:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:06:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:07:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:07:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:08:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:08:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:09:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:09:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:10:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:10:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:11:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:11:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:12:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:12:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:13:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:13:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:14:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:14:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:15:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:15:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:16:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:16:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:17:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:17:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:18:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:18:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:19:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:19:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:20:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:20:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:21:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:21:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:21:51 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:21:51 HandlerMagpieKafka [INFO] ---> persistence deal during time:90
+2014-12-17 15:21:51 HandlerMagpieKafka [INFO] ---> write kafka during time:432
+2014-12-17 15:21:51 HandlerMagpieKafka [INFO] ---> the number of entry list: 4
+2014-12-17 15:21:51 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 327
+2014-12-17 15:22:18 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:22:18 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000168,position is :3733; batch id is :105,in batch id is :0
+2014-12-17 15:27:55 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 15:27:55 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 15:27:55 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 15:27:55 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 15:27:55 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:3733:106:0
+2014-12-17 15:27:55 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 15:27:55 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 15:27:56 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:27:56 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:28:02 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:28:02 HandlerMagpieKafka [INFO] ---> persistence deal during time:58
+2014-12-17 15:28:02 HandlerMagpieKafka [INFO] ---> write kafka during time:184
+2014-12-17 15:28:02 HandlerMagpieKafka [INFO] ---> the number of entry list: 4
+2014-12-17 15:28:02 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 327
+2014-12-17 15:28:56 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:28:56 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000168,position is :3968; batch id is :107,in batch id is :0
+2014-12-17 15:30:44 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 15:30:44 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 15:30:44 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 15:30:44 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 15:30:44 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:3968:108:0
+2014-12-17 15:30:44 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 15:30:44 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 15:30:45 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:30:45 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:30:55 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:30:55 HandlerMagpieKafka [INFO] ---> persistence deal during time:61
+2014-12-17 15:30:55 HandlerMagpieKafka [INFO] ---> write kafka during time:191
+2014-12-17 15:30:55 HandlerMagpieKafka [INFO] ---> the number of entry list: 4
+2014-12-17 15:30:55 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 327
+2014-12-17 15:31:45 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:31:45 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000168,position is :4203; batch id is :109,in batch id is :0
+2014-12-17 15:32:41 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 15:32:41 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 15:32:41 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 15:32:41 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 15:32:41 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:4203:110:0
+2014-12-17 15:32:41 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 15:32:41 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 15:32:42 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:32:42 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:33:06 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 15:33:07 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 15:33:07 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 15:33:07 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 15:33:07 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:4203:110:0
+2014-12-17 15:33:07 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 15:33:07 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 15:33:08 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:33:08 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:33:13 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:33:13 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:33:13 HandlerMagpieKafka [INFO] ---> write kafka during time:179
+2014-12-17 15:33:13 HandlerMagpieKafka [INFO] ---> the number of entry list: 4
+2014-12-17 15:33:13 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 327
+2014-12-17 15:43:29 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 15:43:29 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 15:43:29 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 15:43:29 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 15:43:29 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:4438:112:0
+2014-12-17 15:43:29 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 15:43:29 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 15:43:30 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:43:30 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :298; batch id is :114,in batch id is :2
+2014-12-17 15:43:30 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:43:30 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:43:30 HandlerMagpieKafka [INFO] ---> write kafka during time:238
+2014-12-17 15:43:30 HandlerMagpieKafka [INFO] ---> the number of entry list: 7
+2014-12-17 15:43:30 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 595
+2014-12-17 15:43:46 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:43:46 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:43:46 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-17 15:43:46 HandlerMagpieKafka [INFO] ---> the number of entry list: 3
+2014-12-17 15:43:46 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 269
+2014-12-17 15:46:43 HandlerMagpieKafka [INFO] initializing......
+2014-12-17 15:46:43 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-17 15:46:43 HandlerMagpieKafka [INFO] finding position......
+2014-12-17 15:46:43 HandlerMagpieKafka [INFO] find zk position......
+2014-12-17 15:46:43 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:489:116:0
+2014-12-17 15:46:43 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-17 15:46:43 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-17 15:46:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:46:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:47:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:47:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-17 15:47:46 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:47:46 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:47:46 HandlerMagpieKafka [INFO] ---> write kafka during time:182
+2014-12-17 15:47:46 HandlerMagpieKafka [INFO] ---> the number of entry list: 3
+2014-12-17 15:47:46 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 269
+2014-12-17 15:48:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:48:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :680; batch id is :116,in batch id is :2
+2014-12-17 15:49:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:49:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :680; batch id is :116,in batch id is :2
+2014-12-17 15:50:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:50:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :680; batch id is :116,in batch id is :2
+2014-12-17 15:51:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:51:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :680; batch id is :116,in batch id is :2
+2014-12-17 15:51:55 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:51:55 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:51:55 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-17 15:51:55 HandlerMagpieKafka [INFO] ---> the number of entry list: 3
+2014-12-17 15:51:55 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 270
+2014-12-17 15:52:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:52:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :871; batch id is :117,in batch id is :2
+2014-12-17 15:52:45 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:52:45 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:52:45 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-17 15:52:45 HandlerMagpieKafka [INFO] ---> the number of entry list: 3
+2014-12-17 15:52:45 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 270
+2014-12-17 15:53:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:53:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1062; batch id is :118,in batch id is :2
+2014-12-17 15:54:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:54:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1062; batch id is :118,in batch id is :2
+2014-12-17 15:55:02 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:55:02 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:55:02 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-17 15:55:02 HandlerMagpieKafka [INFO] ---> the number of entry list: 3
+2014-12-17 15:55:02 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 373
+2014-12-17 15:55:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:55:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1269; batch id is :119,in batch id is :2
+2014-12-17 15:56:07 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:56:07 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:56:07 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-17 15:56:07 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-17 15:56:07 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 193
+2014-12-17 15:56:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:56:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1436; batch id is :120,in batch id is :0
+2014-12-17 15:57:16 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-17 15:57:16 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-17 15:57:16 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-17 15:57:16 HandlerMagpieKafka [INFO] ---> the number of entry list: 3
+2014-12-17 15:57:16 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 270
+2014-12-17 15:57:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:57:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1627; batch id is :121,in batch id is :2
+2014-12-17 15:58:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:58:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1627; batch id is :121,in batch id is :2
+2014-12-17 15:59:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 15:59:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1627; batch id is :121,in batch id is :2
+2014-12-17 16:00:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 16:00:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1627; batch id is :121,in batch id is :2
+2014-12-17 16:01:44 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-17 16:01:44 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000169,position is :1627; batch id is :121,in batch id is :2

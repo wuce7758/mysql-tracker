@@ -1,7 +1,8 @@
 package com.jd.bdp.mysql.tracker;
 
 import com.jd.bdp.magpie.Topology;
-import tracker.TrackerConfiger;
+import tracker.HandlerForMagpieHBase;
+import tracker.utils.TrackerConfiger;
 
 /**
  * Created by hp on 14-9-22.
@@ -20,7 +21,7 @@ public class LogTracker {
         cnf.setHbaseZkQuorum("BJ-YZH-1-H1-3660.jd.com,BJ-YZH-1-H1-3661.jd.com,BJ-YZH-1-H1-3662.jd.com");
         cnf.setHbaseZkPort("2181");
         cnf.setDfsSocketTimeout("180000");
-        HandlerForMagpie handler = new HandlerForMagpie(cnf);
+        HandlerForMagpieHBase handler = new HandlerForMagpieHBase(cnf);
         Topology topology = new Topology(handler);
         topology.run();
     }

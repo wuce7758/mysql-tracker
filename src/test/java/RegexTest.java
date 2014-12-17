@@ -1,7 +1,4 @@
-import tracker.FilterMatcher;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import filter.FilterMatcher;
 
 /**
  * Created by hp on 14-12-1.
@@ -31,6 +28,10 @@ public class RegexTest {
         print(fm.isMatch("test.canal"));
         print(fm.isMatch("coco.regex"));
         print(fm.isMatch("coco.tyhyhy"));
+        FilterMatcher fms = new FilterMatcher("canal_test\\..*");
+        print(fm.isMatch("canal_test.test"));
+        String s="canal_test.simple";
+        System.out.println(s.matches("canal_test\\.simple"));
 
     }
 

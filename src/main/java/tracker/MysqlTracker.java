@@ -1,20 +1,25 @@
 package tracker;
 
 
-import dbsync.*;
-import dbsync.event.QueryLogEvent;
-import driver.MysqlConnector;
-import driver.MysqlQueryExecutor;
-import driver.MysqlUpdateExecutor;
-import driver.packets.HeaderPacket;
-import driver.packets.client.BinlogDumpCommandPacket;
-import driver.packets.server.ResultSetPacket;
-import driver.utils.PacketManager;
+import tracker.common.TableMetaCache;
+import mysql.dbsync.*;
+import mysql.dbsync.event.QueryLogEvent;
+import mysql.driver.MysqlConnector;
+import mysql.driver.MysqlQueryExecutor;
+import mysql.driver.MysqlUpdateExecutor;
+import mysql.driver.packets.HeaderPacket;
+import mysql.driver.packets.client.BinlogDumpCommandPacket;
+import mysql.driver.packets.server.ResultSetPacket;
+import mysql.driver.utils.PacketManager;
 import org.apache.commons.lang.StringUtils;
 //import org.jruby.RubyProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+import tracker.parser.LogEventConvert;
+import tracker.position.EntryPosition;
+import protocol.protobuf.CanalEntry;
+import tracker.utils.TrackerConfiger;
 
 
 import java.io.*;
@@ -200,7 +205,7 @@ public class MysqlTracker {
         }
     }
 
-    //Thread : take the binlog data to List from common queue if List.size or time demand the condition
+    //Thread : take the binlog data to List from tracker.common queue if List.size or time demand the condition
     //         and the last event is end event then we persistence the list all and clear start time and list
 
     class PersistenceThread extends Thread{
@@ -349,7 +354,7 @@ public class MysqlTracker {
 
         private LogEvent event;
 
-        //dbsync interface
+        //mysql.dbsync interface
         private DirectLogFetcherChannel fetcher;
 
         private LogDecoder decoder;
@@ -409,8 +414,8 @@ public class MysqlTracker {
             dmpHeader.setPacketBodyLength(dmpBody.length);
             dmpHeader.setPacketSequenceNumber((byte) 0x00);
             PacketManager.write(connector.getChannel(), new ByteBuffer[]{ByteBuffer.wrap(dmpHeader.toBytes()), ByteBuffer.wrap(dmpBody)});
-            //initialize the dbsync to fetch the binlog data
-            logger.info("initialize the dbsync class");
+            //initialize the mysql.dbsync to fetch the binlog data
+            logger.info("initialize the mysql.dbsync class");
             fetcher = new DirectLogFetcherChannel(connector.getReceiveBufferSize());
             fetcher.start(connector.getChannel());
             decoder = new LogDecoder(LogEvent.UNKNOWN_EVENT, LogEvent.ENUM_END_EVENT);
