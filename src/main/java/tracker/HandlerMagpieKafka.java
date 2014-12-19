@@ -116,6 +116,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
 //            config.username = jcontent.getString("Username");
 //            config.password = jcontent.getString("Password");
 //        }
+        //init test envrionment
+        config.testInit();
         //generate the driver, interface etc.
         logConnector = new MysqlConnector(new InetSocketAddress(config.address, config.myPort),
                 config.username,
@@ -145,7 +147,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //table meta cache
         tableMetaCache = new TableMetaCache(tableConnector);
         //queue
-        eventQueue = new LinkedBlockingQueue<LogEvent>(config.batchsize);
+        eventQueue = new LinkedBlockingQueue<LogEvent>(config.queuesize);
         //kafka
         KafkaConf kcnf = new KafkaConf();
         kcnf.brokerList = config.brokerList;
@@ -391,13 +393,6 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             LogEvent event = eventQueue.take();
             if(event == null) continue;
             if(isEndEvent(event)) lastEvent = event;
-            if(event == lastEvent) {
-                binlog = eventConvert.getBinlogFileName();
-                globalBinlogName = binlog;
-                globalXidEvent = event;
-                globalXidBatchId = batchId;
-                globalXidInBatchId = inBatchId;
-            }
             CanalEntry.Entry entry = eventConvert.parse(event);
             if(entry != null) {
                 eventConvert.setBatchId(batchId);
@@ -408,6 +403,13 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     batchId++;
                 }
                 entryList.add(CanalEntry.Entry.newBuilder(entry).build());//build or new object
+            }
+            if(event == lastEvent) {
+                binlog = eventConvert.getBinlogFileName();
+                globalBinlogName = binlog;
+                globalXidEvent = event;
+                globalXidBatchId = batchId;
+                globalXidInBatchId = inBatchId;
             }
             if(entryList.size() >= config.batchsize) break;
         }
