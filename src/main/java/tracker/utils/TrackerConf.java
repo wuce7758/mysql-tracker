@@ -31,7 +31,7 @@ public class TrackerConf {
     public String persisPath = rootPath + "/persis";
     public String minutePath = rootPath + "/minutes";
     //tracker conf
-    public int batchsize = 200000;
+    public int batchsize = 10000;
     public int queuesize = 50000;
     public int sumBatch = 5 * batchsize;
     public int timeInterval = 1;
@@ -47,17 +47,17 @@ public class TrackerConf {
 //    }
 
     public void testInit() {
-        username = "canal";
-        password = "canal";
-        address = "192.168.144.116";
+        username = "jd_data";
+        password = "jd_data";
+        address = "172.17.36.48";
         myPort = 3306;
-        brokerList = "192.168.144.118:9092";
-        brokerSeeds.add("192.168.144.118:9092");
-        brokerSeeds.add("192.168.144.118:9093");
-        brokerSeeds.add("192.168.144.118:9094");
+        brokerList = "172.17.36.53:9092,172.17.36.54:9092,172.17.36.55:9092";
+        brokerSeeds.add("172.17.36.53");
+        brokerSeeds.add("172.17.36.54");
+        brokerSeeds.add("172.17.36.55");
         kafkaPort = 9092;
-        zkKafka = "192.168.144.118:2181/kafka";
+        zkKafka = "172.17.36.60/kafka";
         topic = "mysql_log";
-        zkServers = "192.168.144.110:2181,192.168.144.111:2181,192.168.144.112:2181";
+        zkServers = "172.17.36.60:2181,172.17.36.61:2181,172.17.36.62:2181";
     }
 }
