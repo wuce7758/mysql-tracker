@@ -4,6 +4,8 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import kafka.utils.KafkaConf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +16,11 @@ import java.util.Properties;
  */
 public class KafkaSender {
 
+    private Logger logger = LoggerFactory.getLogger(KafkaSender.class);
+
     private KafkaConf conf;
     private Producer<String, byte[]> producer;
+    private int retrys = 100;
 
     public KafkaSender(KafkaConf cf) {
         conf = cf;
@@ -33,12 +38,12 @@ public class KafkaSender {
 
     public void send(byte[] msg) {
         KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(conf.topic, null, msg);
-        producer.send(keyMsg);
+        blockSend(keyMsg);
     }
 
     public void send(String topic, byte[] msg) {
         KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(topic, null, msg);
-        producer.send(keyMsg);
+        blockSend(keyMsg);
     }
 
     public void send(List<byte[]> msgs) {
@@ -47,7 +52,7 @@ public class KafkaSender {
             KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(conf.topic, null, msg);
             keyMsgs.add(keyMsg);
         }
-        producer.send(keyMsgs);
+        blockSend(keyMsgs);
     }
 
     public void send(String topic, List<byte[]> msgs) {
@@ -56,15 +61,67 @@ public class KafkaSender {
             KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(topic, null, msg);
             keyMsgs.add(keyMsg);
         }
-        producer.send(keyMsgs);
+        blockSend(keyMsgs);
     }
 
     public void sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs) {
-        producer.send(keyMsgs);
+        blockSend(keyMsgs);
+    }
+
+    public void blockSend(List<KeyedMessage<String, byte[]>> keyMsgs) {
+        boolean isAck = false;
+        int retryKafka = 0;
+        while (!isAck) {
+            if(retryKafka >= retrys) {
+                reconnect();
+                logger.warn("retry times out, reconnect the kafka server......");
+                retryKafka = 0;
+            }
+            retryKafka++;
+            try {
+                producer.send(keyMsgs);
+                isAck = true;
+            } catch (Exception e) {
+                logger.warn("retrying sending... Exception:" + e.getMessage());
+                delay(3);
+            }
+        }
+    }
+
+    public void blockSend(KeyedMessage<String, byte[]> keyMsg) {
+        boolean isAck = false;
+        int retryKafka = 0;
+        while (!isAck) {
+            if(retryKafka >= retrys) {
+                reconnect();
+                logger.warn("retry times out, reconnect the kafka server......");
+                retryKafka = 0;
+            }
+            retryKafka++;
+            try {
+                producer.send(keyMsg);
+                isAck = true;
+            } catch (Exception e) {
+                logger.warn("retrying sending... Exception:" + e.getMessage());
+                delay(3);
+            }
+        }
+    }
+
+    private void delay(int sec) {
+        try {
+            Thread.sleep(sec * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void close() {
         if(producer != null) producer.close();
     }
 
+    public void reconnect() {
+        close();
+        connect();
+    }
 }

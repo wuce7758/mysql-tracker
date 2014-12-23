@@ -129,7 +129,13 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 config.username,
                 config.password);
         boolean mysqlExists = false;
+        int retryMysql = 0;
         while (!mysqlExists) {
+            if(retryMysql >= config.retrys) {//reload
+                globalFetchThread = 1;
+                throw new RetryTimesOutException("reload job......");
+            }
+            retryMysql++;
             try {
                 logConnector.connect();
                 tableConnector.connect();
@@ -159,7 +165,23 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         ZkConf zcnf = new ZkConf();
         zcnf.zkServers = config.zkServers;
         zkExecutor = new ZkExecutor(zcnf);
-        zkExecutor.connect();
+        boolean isZk = false;
+        int retryZk = 0;
+        while (!isZk) {
+            if(retryZk >= config.retrys) {
+                globalFetchThread = 1;
+                throw new RetryTimesOutException("reload job......");//reload
+            }
+            retryZk++;
+            try {
+                zkExecutor.connect();
+                isZk = true;
+            } catch (Exception e) {
+                logger.error("connect zk failed , retrying......");
+                e.printStackTrace();
+                delay(3);
+            }
+        }
         initZk();
         //filter
         fm = new FilterMatcher(config.filterRegex);
@@ -185,14 +207,29 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     }
 
     private void initZk() throws Exception {
-        if(!zkExecutor.exists(config.rootPath)) {
-            zkExecutor.create(config.rootPath,"");
-        }
-        if(!zkExecutor.exists(config.persisPath)) {
-            zkExecutor.create(config.persisPath,"");
-        }
-        if(!zkExecutor.exists(config.minutePath)) {
-            zkExecutor.create(config.minutePath,"");
+        boolean isZk =false;
+        int retryZk = 0;
+        while (!isZk) {
+            if(retryZk >= config.retrys) {
+                globalFetchThread = 1;
+                throw new RetryTimesOutException("reload job......");
+            }
+            retryZk++;
+            try {
+                if (!zkExecutor.exists(config.rootPath)) {
+                    zkExecutor.create(config.rootPath, "");
+                }
+                if (!zkExecutor.exists(config.persisPath)) {
+                    zkExecutor.create(config.persisPath, "");
+                }
+                if (!zkExecutor.exists(config.minutePath)) {
+                    zkExecutor.create(config.minutePath, "");
+                }
+                isZk = true;
+            } catch (Exception e) {
+                logger.error("retrying...... Exception:" + e.getMessage());
+                delay(3);
+            }
         }
     }
 
@@ -248,12 +285,18 @@ public class HandlerMagpieKafka implements MagpieExecutor {
 
     public void prepare(String id) throws Exception {
         jobId = id;
-        init();
+        try {
+            init();
+        } catch (RetryTimesOutException e) {//reload the job by run()
+            logger.error(e.getMessage());
+            return;
+        }
         //start thread
         fetcher.start();
         timer.schedule(minter, 1000, config.minsec * 1000);
         //log
         logger.info("start the tracker successfully......");
+        delay(3);//waiting threads start
     }
 
     class Fetcher extends Thread {
@@ -303,11 +346,15 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         logger.error(e1.getMessage());
                         e1.printStackTrace();
                     }
-                    globalFetchThread = 1;
+                    globalFetchThread = 1;//reload
+                    return;
                 }
                 if(errMsg.contains("zk position is error")) {
-                    globalFetchThread = 1;
+                    globalFetchThread = 1;//reload
+                    return;
                 }
+                //all exception we will reload the job
+                globalFetchThread = 1;
             }
         }
 
@@ -348,21 +395,21 @@ public class HandlerMagpieKafka implements MagpieExecutor {
 
         @Override
         public void run(){
+            Calendar cal = Calendar.getInstance();
+            DateFormat sdf = new SimpleDateFormat("HH:mm");
+            DateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
+            String time = sdf.format(cal.getTime());
+            String date = sdfDate.format(cal.getTime());
+            String xidValue = null;
+            long pos = -1;
+            if(globalXidEvent != null) {
+                pos = globalXidEvent.getLogPos();
+                xidValue = globalBinlogName + ":" + globalXidEvent.getLogPos() + ":" + globalXidBatchId + ":" + globalXidInBatchId;
+            } else {
+                pos = -1;
+                xidValue = globalBinlogName + ":" + "-1" + ":" + globalXidBatchId + ":" + globalXidInBatchId;
+            }
             try {
-                Calendar cal = Calendar.getInstance();
-                DateFormat sdf = new SimpleDateFormat("HH:mm");
-                DateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
-                String time = sdf.format(cal.getTime());
-                String date = sdfDate.format(cal.getTime());
-                String xidValue = null;
-                long pos = -1;
-                if(globalXidEvent != null) {
-                    pos = globalXidEvent.getLogPos();
-                    xidValue = globalBinlogName + ":" + globalXidEvent.getLogPos() + ":" + globalXidBatchId + ":" + globalXidInBatchId;
-                } else {
-                    pos = -1;
-                    xidValue = globalBinlogName + ":" + "-1" + ":" + globalXidBatchId + ":" + globalXidInBatchId;
-                }
                 if(!zkExecutor.exists(config.minutePath+"/"+date)) {
                     zkExecutor.create(config.minutePath+"/"+date,date);
                 }
@@ -371,13 +418,37 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 } else  {
                     zkExecutor.set(config.minutePath + "/" + date + "/" + time, xidValue);
                 }
-                logger.info("===================================> per minute thread :");
-                logger.info("---> binlog file is " + globalBinlogName +
-                        ",position is :" + pos + "; batch id is :" + globalXidBatchId +
-                        ",in batch id is :" + globalXidInBatchId);
             } catch (Exception e) {
                 e.printStackTrace();
+                logger.error(e.getMessage());
+                boolean isconn = false;
+                int retryZk = 0;
+                while (!isconn) { //retry
+                    if(retryZk >= config.retrys) {//reload
+                        globalFetchThread = 1;
+                        return;
+                    }
+                    retryZk++;
+                    try {
+                        if (!zkExecutor.exists(config.minutePath + "/" + date)) {
+                            zkExecutor.create(config.minutePath + "/" + date, date);
+                        }
+                        if (!zkExecutor.exists(config.minutePath + "/" + date + "/" + time)) {
+                            zkExecutor.create(config.minutePath + "/" + date + "/" + time, xidValue);
+                        } else {
+                            zkExecutor.set(config.minutePath + "/" + date + "/" + time, xidValue);
+                        }
+                        isconn = true;
+                    } catch (Exception e1) {
+                        logger.error("retrying...... Exception:" +e1.getMessage());
+                        delay(3);
+                    }
+                }
             }
+            logger.info("===================================> per minute thread :");
+            logger.info("---> binlog file is " + globalBinlogName +
+                    ",position is :" + pos + "; batch id is :" + globalXidBatchId +
+                    ",in batch id is :" + globalXidInBatchId);
         }
     }
 
@@ -385,7 +456,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //check fetch thread status
         if(globalFetchThread == 1) {
             globalFetchThread = 0;
+            logger.error("connect loss or position is error!!! reload......");
             reload(jobId);
+            delay(5);
             return;
         }
         //take the data from the queue
@@ -450,7 +523,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         }
         monitor.persistenceEnd = System.currentTimeMillis();
         monitor.hbaseWriteStart = System.currentTimeMillis();
-        if(bytesList.size() > 0) msgSender.send(bytesList);
+        if(bytesList.size() > 0) {
+            msgSender.send(bytesList);
+        }
         monitor.hbaseWriteEnd = System.currentTimeMillis();
 
     }
@@ -458,7 +533,27 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private void confirmPos(LogEvent last, String bin) throws Exception {
         if(last != null) {
             String pos = bin + ":" + last.getLogPos() + ":" + batchId + ":" + inBatchId;
-            zkExecutor.set(config.persisPath, pos);
+            try {
+                zkExecutor.set(config.persisPath, pos);
+            } catch (Exception e) { //retry
+                logger.error(e.getMessage());
+                boolean isconn = false;
+                int isZk = 0;
+                while (!isconn) {
+                    if(isZk >= config.retrys) {
+                        globalFetchThread = 1;
+                        return;
+                    }
+                    isZk++;
+                    try {
+                        zkExecutor.set(config.persisPath, pos);
+                        isconn = true;
+                    } catch (Exception e1) {
+                        logger.error("retrying...... Exception:" +e1.getMessage());
+                        delay(3);
+                    }
+                }
+            }
         }
     }
 
@@ -489,5 +584,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         tableConnector.disconnect();
         msgSender.close();
         zkExecutor.close();
+    }
+
+    class RetryTimesOutException extends Exception {
+        public RetryTimesOutException(String msg) {
+            super(msg);
+        }
     }
 }

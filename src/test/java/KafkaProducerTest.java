@@ -22,12 +22,12 @@ public class KafkaProducerTest {
         ProducerConfig config = new ProducerConfig(props);
         Producer<String, String> producer = new Producer<String, String>(config);
         Random rnd = new Random();
-        long events = 100;
+        long events = 1;
         for(int i=0;i<events;i++) {
             long runtime = new Date().getTime();
             String ip = "192.168.2." + rnd.nextInt(255);
             String msg = runtime + ",www.example.com." + ip;
-            KeyedMessage<String, String> data = new KeyedMessage<String, String>("page_visits", ip, msg);
+            KeyedMessage<String, String> data = new KeyedMessage<String, String>("test", ip, msg);
             producer.send(data);
         }
         producer.close();

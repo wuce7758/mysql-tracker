@@ -37,6 +37,7 @@ public class TrackerConf {
     public int timeInterval = 1;
     public String filterRegex = ".*\\..*";
     public int minsec = 60;
+    public int retrys = 100;//if we retry 100 connect or send failed too, we will reload the job
 
 //    static  {
 //        brokerSeeds.add("127.0.0.1");
