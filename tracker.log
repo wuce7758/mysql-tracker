@@ -1,330 +1,516 @@
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$1.apply$mcV$sp(DefaultEventHandler.scala:67)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:67)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 Utils$ [ERROR] fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-kafka.common.KafkaException: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:67)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$1.apply$mcV$sp(DefaultEventHandler.scala:67)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:67)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-Caused by: java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	... 9 more
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.BrokerPartitionInfo.getBrokerPartitionInfo(BrokerPartitionInfo.scala:49)
-	at kafka.producer.async.DefaultEventHandler.kafka$producer$async$DefaultEventHandler$$getPartitionListForTopic(DefaultEventHandler.scala:186)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:150)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:149)
-	at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:60)
-	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:47)
-	at kafka.producer.async.DefaultEventHandler.partitionAndCollate(DefaultEventHandler.scala:149)
-	at kafka.producer.async.DefaultEventHandler.dispatchSerializedData(DefaultEventHandler.scala:95)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:72)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 DefaultEventHandler [ERROR] Failed to collate messages by topic, partition due to: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 Utils$ [ERROR] fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-kafka.common.KafkaException: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:67)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-Caused by: java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	... 9 more
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.BrokerPartitionInfo.getBrokerPartitionInfo(BrokerPartitionInfo.scala:49)
-	at kafka.producer.async.DefaultEventHandler.kafka$producer$async$DefaultEventHandler$$getPartitionListForTopic(DefaultEventHandler.scala:186)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:150)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:149)
-	at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:60)
-	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:47)
-	at kafka.producer.async.DefaultEventHandler.partitionAndCollate(DefaultEventHandler.scala:149)
-	at kafka.producer.async.DefaultEventHandler.dispatchSerializedData(DefaultEventHandler.scala:95)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:72)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 DefaultEventHandler [ERROR] Failed to collate messages by topic, partition due to: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 Utils$ [ERROR] fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-kafka.common.KafkaException: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:67)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-Caused by: java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	... 9 more
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.BrokerPartitionInfo.getBrokerPartitionInfo(BrokerPartitionInfo.scala:49)
-	at kafka.producer.async.DefaultEventHandler.kafka$producer$async$DefaultEventHandler$$getPartitionListForTopic(DefaultEventHandler.scala:186)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:150)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:149)
-	at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:60)
-	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:47)
-	at kafka.producer.async.DefaultEventHandler.partitionAndCollate(DefaultEventHandler.scala:149)
-	at kafka.producer.async.DefaultEventHandler.dispatchSerializedData(DefaultEventHandler.scala:95)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:72)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 DefaultEventHandler [ERROR] Failed to collate messages by topic, partition due to: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 Utils$ [ERROR] fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-kafka.common.KafkaException: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:67)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-Caused by: java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	... 9 more
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.BrokerPartitionInfo.getBrokerPartitionInfo(BrokerPartitionInfo.scala:49)
-	at kafka.producer.async.DefaultEventHandler.kafka$producer$async$DefaultEventHandler$$getPartitionListForTopic(DefaultEventHandler.scala:186)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:150)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$partitionAndCollate$1.apply(DefaultEventHandler.scala:149)
-	at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:60)
-	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:47)
-	at kafka.producer.async.DefaultEventHandler.partitionAndCollate(DefaultEventHandler.scala:149)
-	at kafka.producer.async.DefaultEventHandler.dispatchSerializedData(DefaultEventHandler.scala:95)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:72)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 DefaultEventHandler [ERROR] Failed to collate messages by topic, partition due to: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-2014-12-23 14:29:25 SyncProducer [ERROR] Producer connection to localhost:9092 unsuccessful
-java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-2014-12-23 14:29:25 Utils$ [ERROR] fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-kafka.common.KafkaException: fetching topic metadata for topics [Set(test)] from broker [ArrayBuffer(id:0,host:localhost,port:9092)] failed
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:67)
-	at kafka.producer.BrokerPartitionInfo.updateInfo(BrokerPartitionInfo.scala:82)
-	at kafka.producer.async.DefaultEventHandler$$anonfun$handle$2.apply$mcV$sp(DefaultEventHandler.scala:78)
-	at kafka.utils.Utils$.swallow(Utils.scala:167)
-	at kafka.utils.Logging$class.swallowError(Logging.scala:106)
-	at kafka.utils.Utils$.swallowError(Utils.scala:46)
-	at kafka.producer.async.DefaultEventHandler.handle(DefaultEventHandler.scala:78)
-	at kafka.producer.Producer.send(Producer.scala:76)
-	at kafka.javaapi.producer.Producer.send(Producer.scala:33)
-	at KafkaProducerTest.main(KafkaProducerTest.java:31)
-Caused by: java.net.ConnectException: 拒绝连接
-	at sun.nio.ch.Net.connect0(Native Method)
-	at sun.nio.ch.Net.connect(Net.java:465)
-	at sun.nio.ch.Net.connect(Net.java:457)
-	at sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:670)
-	at kafka.network.BlockingChannel.connect(BlockingChannel.scala:57)
-	at kafka.producer.SyncProducer.connect(SyncProducer.scala:141)
-	at kafka.producer.SyncProducer.getOrMakeConnection(SyncProducer.scala:156)
-	at kafka.producer.SyncProducer.kafka$producer$SyncProducer$$doSend(SyncProducer.scala:68)
-	at kafka.producer.SyncProducer.send(SyncProducer.scala:112)
-	at kafka.client.ClientUtils$.fetchTopicMetadata(ClientUtils.scala:53)
-	... 9 more
-2014-12-23 14:29:25 DefaultEventHandler [ERROR] Failed to send requests for topics test with correlation ids in [0,8]
+2014-12-24 14:43:35 HandlerMagpieKafka [INFO] initializing......
+2014-12-24 14:43:36 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-24 14:43:36 HandlerMagpieKafka [INFO] finding position......
+2014-12-24 14:43:36 HandlerMagpieKafka [INFO] find zk position......
+2014-12-24 14:43:36 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:78572508:8:0
+2014-12-24 14:43:36 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-24 14:43:36 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-24 14:43:37 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:43:37 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-24 14:44:37 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:44:37 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-24 14:44:44 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:44 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:44:44 HandlerMagpieKafka [INFO] ---> write kafka during time:1121
+2014-12-24 14:44:44 HandlerMagpieKafka [INFO] ---> the number of entry list: 2
+2014-12-24 14:44:44 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 403
+2014-12-24 14:44:44 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :462; batch id is :10,in batch id is :0
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 68796
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 556006
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 95
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:46 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555322
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> persistence deal during time:95
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> write kafka during time:1194
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> the number of entry list: 10000
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2656649
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :462; batch id is :10,in batch id is :0
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 3144
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555237
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 57
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:49 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555496
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> persistence deal during time:17
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> write kafka during time:95
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2668887
+2014-12-24 14:44:49 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :1111585; batch id is :11,in batch id is :0
+2014-12-24 14:44:50 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:50 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:44:50 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-24 14:44:50 HandlerMagpieKafka [INFO] ---> the number of entry list: 3
+2014-12-24 14:44:50 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 606
+2014-12-24 14:44:50 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :2222454; batch id is :12,in batch id is :0
+2014-12-24 14:44:50 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:50 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1584
+2014-12-24 14:44:50 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:50 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555417
+2014-12-24 14:44:51 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 46
+2014-12-24 14:44:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555509
+2014-12-24 14:44:52 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:52 HandlerMagpieKafka [INFO] ---> persistence deal during time:28
+2014-12-24 14:44:52 HandlerMagpieKafka [INFO] ---> write kafka during time:480
+2014-12-24 14:44:52 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:44:52 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678138
+2014-12-24 14:44:52 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :2222454; batch id is :12,in batch id is :0
+2014-12-24 14:44:53 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:53 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:44:53 HandlerMagpieKafka [INFO] ---> write kafka during time:4
+2014-12-24 14:44:53 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:44:53 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 68
+2014-12-24 14:44:53 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :3333480; batch id is :13,in batch id is :0
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 5688
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555410
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 27
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555676
+2014-12-24 14:44:57 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:57 HandlerMagpieKafka [INFO] ---> persistence deal during time:11
+2014-12-24 14:44:57 HandlerMagpieKafka [INFO] ---> write kafka during time:286
+2014-12-24 14:44:57 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:44:57 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678241
+2014-12-24 14:44:57 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :3333480; batch id is :13,in batch id is :0
+2014-12-24 14:44:58 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:58 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:44:58 HandlerMagpieKafka [INFO] ---> write kafka during time:1
+2014-12-24 14:44:58 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:44:58 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 68
+2014-12-24 14:44:58 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :4444701; batch id is :14,in batch id is :0
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 2131
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555526
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 27
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:44:58 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555285
+2014-12-24 14:44:59 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:44:59 HandlerMagpieKafka [INFO] ---> persistence deal during time:11
+2014-12-24 14:44:59 HandlerMagpieKafka [INFO] ---> write kafka during time:30
+2014-12-24 14:44:59 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:44:59 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678017
+2014-12-24 14:44:59 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :4444701; batch id is :14,in batch id is :0
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 4028
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555653
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 27
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:02 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555324
+2014-12-24 14:45:03 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:03 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:45:03 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-24 14:45:03 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:45:03 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 68
+2014-12-24 14:45:03 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :5555617; batch id is :15,in batch id is :0
+2014-12-24 14:45:11 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:11 HandlerMagpieKafka [INFO] ---> persistence deal during time:8
+2014-12-24 14:45:11 HandlerMagpieKafka [INFO] ---> write kafka during time:227
+2014-12-24 14:45:11 HandlerMagpieKafka [INFO] ---> the number of entry list: 10000
+2014-12-24 14:45:11 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677840
+2014-12-24 14:45:11 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :5555617; batch id is :15,in batch id is :0
+2014-12-24 14:45:12 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:12 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:45:12 HandlerMagpieKafka [INFO] ---> write kafka during time:1
+2014-12-24 14:45:12 HandlerMagpieKafka [INFO] ---> the number of entry list: 2
+2014-12-24 14:45:12 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 333
+2014-12-24 14:45:12 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :6666662; batch id is :16,in batch id is :0
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 9993
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555315
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 26
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555600
+2014-12-24 14:45:19 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:19 HandlerMagpieKafka [INFO] ---> persistence deal during time:10
+2014-12-24 14:45:19 HandlerMagpieKafka [INFO] ---> write kafka during time:33
+2014-12-24 14:45:19 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:45:19 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678068
+2014-12-24 14:45:19 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :6666662; batch id is :16,in batch id is :0
+2014-12-24 14:45:20 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:20 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:45:20 HandlerMagpieKafka [INFO] ---> write kafka during time:1
+2014-12-24 14:45:20 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:45:20 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 68
+2014-12-24 14:45:20 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :7777716; batch id is :17,in batch id is :0
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 11579
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555121
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 27
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:24 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555167
+2014-12-24 14:45:24 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:24 HandlerMagpieKafka [INFO] ---> persistence deal during time:11
+2014-12-24 14:45:24 HandlerMagpieKafka [INFO] ---> write kafka during time:36
+2014-12-24 14:45:24 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:45:24 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677363
+2014-12-24 14:45:24 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :7777716; batch id is :17,in batch id is :0
+2014-12-24 14:45:28 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:28 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:45:28 HandlerMagpieKafka [INFO] ---> write kafka during time:1141
+2014-12-24 14:45:28 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:45:28 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 68
+2014-12-24 14:45:28 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :8888102; batch id is :18,in batch id is :0
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 6503
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555449
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 26
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555509
+2014-12-24 14:45:31 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:31 HandlerMagpieKafka [INFO] ---> persistence deal during time:10
+2014-12-24 14:45:31 HandlerMagpieKafka [INFO] ---> write kafka during time:31
+2014-12-24 14:45:31 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:45:31 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678170
+2014-12-24 14:45:31 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :8888102; batch id is :18,in batch id is :0
+2014-12-24 14:45:33 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:33 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:45:33 HandlerMagpieKafka [INFO] ---> write kafka during time:203
+2014-12-24 14:45:33 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:45:33 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 68
+2014-12-24 14:45:33 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :9999177; batch id is :19,in batch id is :0
+2014-12-24 14:45:38 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:45:38 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000180,position is :9999177; batch id is :19,in batch id is :0
+2014-12-24 14:45:40 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:40 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 9847
+2014-12-24 14:45:40 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:40 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555408
+2014-12-24 14:45:41 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:45:41 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 26
+2014-12-24 14:45:41 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:45:41 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555390
+2014-12-24 14:45:42 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:43 HandlerMagpieKafka [INFO] ---> persistence deal during time:10
+2014-12-24 14:45:43 HandlerMagpieKafka [INFO] ---> write kafka during time:83
+2014-12-24 14:45:43 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:45:43 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678006
+2014-12-24 14:45:43 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :9999177; batch id is :19,in batch id is :0
+2014-12-24 14:45:45 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:45:45 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:45:45 HandlerMagpieKafka [INFO] ---> write kafka during time:1
+2014-12-24 14:45:45 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:45:45 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 68
+2014-12-24 14:45:45 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :11110084; batch id is :20,in batch id is :0
+2014-12-24 14:46:37 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:46:37 HandlerMagpieKafka [INFO] ---> persistence deal during time:11
+2014-12-24 14:46:37 HandlerMagpieKafka [INFO] ---> write kafka during time:3082
+2014-12-24 14:46:37 HandlerMagpieKafka [INFO] ---> the number of entry list: 4760
+2014-12-24 14:46:37 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 36663114
+2014-12-24 14:46:37 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :15961595; batch id is :21,in batch id is :0
+2014-12-24 14:46:38 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:46:38 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000180,position is :15961595; batch id is :21,in batch id is :0
+2014-12-24 14:47:38 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:47:38 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000180,position is :15961595; batch id is :21,in batch id is :0
+2014-12-24 14:48:37 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:48:38 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000180,position is :15961595; batch id is :21,in batch id is :0
+2014-12-24 14:49:38 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:49:38 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000180,position is :15961595; batch id is :21,in batch id is :0
+2014-12-24 14:54:03 HandlerMagpieKafka [INFO] initializing......
+2014-12-24 14:54:05 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-24 14:54:05 HandlerMagpieKafka [INFO] finding position......
+2014-12-24 14:54:05 HandlerMagpieKafka [INFO] find zk position......
+2014-12-24 14:54:05 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:15961595:21:0
+2014-12-24 14:54:05 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-24 14:54:05 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-24 14:54:06 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:54:06 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-24 14:54:26 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:26 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:54:26 HandlerMagpieKafka [INFO] ---> write kafka during time:427
+2014-12-24 14:54:26 HandlerMagpieKafka [INFO] ---> the number of entry list: 2
+2014-12-24 14:54:26 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 408
+2014-12-24 14:54:26 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :15961950; batch id is :23,in batch id is :0
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 22331
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555773
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 81
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:28 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555273
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 650
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555271
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 38
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:29 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555537
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1005
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555515
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 31
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:30 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555726
+2014-12-24 14:54:30 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:30 HandlerMagpieKafka [INFO] ---> persistence deal during time:152
+2014-12-24 14:54:30 HandlerMagpieKafka [INFO] ---> write kafka during time:675
+2014-12-24 14:54:30 HandlerMagpieKafka [INFO] ---> the number of entry list: 10000
+2014-12-24 14:54:30 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2666522
+2014-12-24 14:54:30 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :15961950; batch id is :23,in batch id is :0
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> persistence deal during time:11
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> write kafka during time:74
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677800
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :17072794; batch id is :24,in batch id is :0
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> persistence deal during time:20
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> write kafka during time:263
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678221
+2014-12-24 14:54:31 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :18183715; batch id is :25,in batch id is :0
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1776
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555569
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 44
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:31 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555225
+2014-12-24 14:54:32 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:32 HandlerMagpieKafka [INFO] ---> persistence deal during time:7
+2014-12-24 14:54:32 HandlerMagpieKafka [INFO] ---> write kafka during time:41
+2014-12-24 14:54:32 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:54:32 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677771
+2014-12-24 14:54:32 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :19295055; batch id is :26,in batch id is :0
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1039
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555101
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 26
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:54:33 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 554987
+2014-12-24 14:54:33 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:33 HandlerMagpieKafka [INFO] ---> persistence deal during time:12
+2014-12-24 14:54:33 HandlerMagpieKafka [INFO] ---> write kafka during time:47
+2014-12-24 14:54:33 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:54:33 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2676999
+2014-12-24 14:54:33 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :20405976; batch id is :27,in batch id is :0
+2014-12-24 14:54:34 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:34 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:54:34 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-24 14:54:34 HandlerMagpieKafka [INFO] ---> the number of entry list: 6
+2014-12-24 14:54:34 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 1415
+2014-12-24 14:54:34 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :21516176; batch id is :28,in batch id is :0
+2014-12-24 14:54:37 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:54:37 HandlerMagpieKafka [INFO] ---> persistence deal during time:6
+2014-12-24 14:54:37 HandlerMagpieKafka [INFO] ---> write kafka during time:211
+2014-12-24 14:54:37 HandlerMagpieKafka [INFO] ---> the number of entry list: 2490
+2014-12-24 14:54:37 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 18429087
+2014-12-24 14:54:37 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :24044696; batch id is :29,in batch id is :0
+2014-12-24 14:55:06 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:55:06 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000180,position is :24044696; batch id is :29,in batch id is :0
+2014-12-24 14:56:49 HandlerMagpieKafka [INFO] initializing......
+2014-12-24 14:56:50 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-24 14:56:50 HandlerMagpieKafka [INFO] finding position......
+2014-12-24 14:56:50 HandlerMagpieKafka [INFO] find zk position......
+2014-12-24 14:56:50 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:24044696:29:0
+2014-12-24 14:56:50 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-24 14:56:50 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 344
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555342
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 85
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555415
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 44
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555526
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 32
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555405
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 53
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:51 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555287
+2014-12-24 14:56:52 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:56:52 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-24 14:56:54 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:54 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 3426
+2014-12-24 14:56:54 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:54 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555240
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> persistence deal during time:206
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> write kafka during time:803
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> the number of entry list: 10000
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2666140
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :24045051; batch id is :31,in batch id is :0
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1338
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555749
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 140
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555337
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> persistence deal during time:13
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> write kafka during time:100
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677830
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :25155611; batch id is :32,in batch id is :0
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 426
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555028
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 64
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:56:56 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555109
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> persistence deal during time:12
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> write kafka during time:58
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677454
+2014-12-24 14:56:56 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :26266651; batch id is :33,in batch id is :0
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> persistence deal during time:11
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> write kafka during time:43
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678122
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :27377293; batch id is :34,in batch id is :0
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> persistence deal during time:6
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> write kafka during time:147
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677139
+2014-12-24 14:56:57 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :28488505; batch id is :35,in batch id is :0
+2014-12-24 14:56:59 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:56:59 HandlerMagpieKafka [INFO] ---> persistence deal during time:9
+2014-12-24 14:56:59 HandlerMagpieKafka [INFO] ---> write kafka during time:455
+2014-12-24 14:56:59 HandlerMagpieKafka [INFO] ---> the number of entry list: 2643
+2014-12-24 14:56:59 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 18642861
+2014-12-24 14:56:59 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :32281075; batch id is :37,in batch id is :0
+2014-12-24 14:57:45 HandlerMagpieKafka [INFO] initializing......
+2014-12-24 14:57:46 HandlerMagpieKafka [INFO] start the tracker successfully......
+2014-12-24 14:57:46 HandlerMagpieKafka [INFO] finding position......
+2014-12-24 14:57:46 HandlerMagpieKafka [INFO] find zk position......
+2014-12-24 14:57:46 HandlerMagpieKafka [INFO] start position :BinlogPosition.dat:32281075:37:0
+2014-12-24 14:57:46 HandlerMagpieKafka$Fetcher [INFO] set the binlog configuration for the binlog dump
+2014-12-24 14:57:46 HandlerMagpieKafka$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2014-12-24 14:57:47 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:57:47 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
+2014-12-24 14:58:08 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:08 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:58:08 HandlerMagpieKafka [INFO] ---> write kafka during time:253
+2014-12-24 14:58:08 HandlerMagpieKafka [INFO] ---> the number of entry list: 2
+2014-12-24 14:58:08 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 408
+2014-12-24 14:58:08 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :32281430; batch id is :39,in batch id is :0
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 25213
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555420
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 122
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:11 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555130
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 734
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555725
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 50
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:12 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555421
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1096
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555390
+2014-12-24 14:58:13 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:13 HandlerMagpieKafka [INFO] ---> persistence deal during time:107
+2014-12-24 14:58:13 HandlerMagpieKafka [INFO] ---> write kafka during time:702
+2014-12-24 14:58:13 HandlerMagpieKafka [INFO] ---> the number of entry list: 10000
+2014-12-24 14:58:13 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2666069
+2014-12-24 14:58:13 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :32281430; batch id is :39,in batch id is :0
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 55
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:13 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555396
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> persistence deal during time:9
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> write kafka during time:38
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678123
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :33391789; batch id is :40,in batch id is :0
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> persistence deal during time:8
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> write kafka during time:64
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677753
+2014-12-24 14:58:14 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :34503033; batch id is :41,in batch id is :0
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1142
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555116
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 31
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:15 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555594
+2014-12-24 14:58:15 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:15 HandlerMagpieKafka [INFO] ---> persistence deal during time:57
+2014-12-24 14:58:15 HandlerMagpieKafka [INFO] ---> write kafka during time:117
+2014-12-24 14:58:15 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:58:15 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2677686
+2014-12-24 14:58:15 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :35613946; batch id is :42,in batch id is :0
+2014-12-24 14:58:16 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:16 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:58:16 HandlerMagpieKafka [INFO] ---> write kafka during time:2
+2014-12-24 14:58:16 HandlerMagpieKafka [INFO] ---> the number of entry list: 5
+2014-12-24 14:58:16 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 1144
+2014-12-24 14:58:16 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :36724759; batch id is :43,in batch id is :0
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 1647
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555574
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ===================================> fetch thread : 
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ---> fetch during time : 49
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ---> fetch number : 10000
+2014-12-24 14:58:16 HandlerMagpieKafka$Fetcher [INFO] ---> fetch sum size : 555758
+2014-12-24 14:58:17 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:17 HandlerMagpieKafka [INFO] ---> persistence deal during time:13
+2014-12-24 14:58:17 HandlerMagpieKafka [INFO] ---> write kafka during time:66
+2014-12-24 14:58:17 HandlerMagpieKafka [INFO] ---> the number of entry list: 10001
+2014-12-24 14:58:17 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 2678573
+2014-12-24 14:58:17 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :36724759; batch id is :43,in batch id is :0
+2014-12-24 14:58:18 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:18 HandlerMagpieKafka [INFO] ---> persistence deal during time:0
+2014-12-24 14:58:18 HandlerMagpieKafka [INFO] ---> write kafka during time:1
+2014-12-24 14:58:18 HandlerMagpieKafka [INFO] ---> the number of entry list: 1
+2014-12-24 14:58:18 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 69
+2014-12-24 14:58:18 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :37836208; batch id is :44,in batch id is :0
+2014-12-24 14:58:48 HandlerMagpieKafka$Minuter [INFO] ===================================> per minute thread :
+2014-12-24 14:58:48 HandlerMagpieKafka$Minuter [INFO] ---> binlog file is mysql-bin.000180,position is :40571100; batch id is :45,in batch id is :0
+2014-12-24 14:58:53 HandlerMagpieKafka [INFO] ===================================> persistence thread:
+2014-12-24 14:58:53 HandlerMagpieKafka [INFO] ---> persistence deal during time:6
+2014-12-24 14:58:53 HandlerMagpieKafka [INFO] ---> write kafka during time:12903
+2014-12-24 14:58:53 HandlerMagpieKafka [INFO] ---> the number of entry list: 2684
+2014-12-24 14:58:53 HandlerMagpieKafka [INFO] ---> entry list to bytes sum size is 18696266
+2014-12-24 14:58:53 HandlerMagpieKafka [INFO] ---> position info: binlog file is mysql-bin.000180,position is :40571100; batch id is :45,in batch id is :0
