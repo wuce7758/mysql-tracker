@@ -73,6 +73,7 @@ public class LogEventConvert {
     private static long                 batchId             = 0;
     private static long                 inId                = 0;
     public FilterMatcher                filter              = new FilterMatcher();
+    private static String               ip                  = "";
 
 
     public void setBatchId(long id) {
@@ -81,6 +82,10 @@ public class LogEventConvert {
 
     public void setInId(long id) {
         inId = id;
+    }
+
+    public void setIp(String address) {
+        ip = address;
     }
 
     public CanalEntry.Entry parse(LogEvent logEvent) throws CanalParseException {
@@ -623,6 +628,7 @@ public class LogEventConvert {
         entryBuilder.setStoreValue(storeValue);
         entryBuilder.setBatchId(batchId);
         entryBuilder.setInId(inId);
+        entryBuilder.setIp(ip);
         return entryBuilder.build();
     }
 

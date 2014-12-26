@@ -108,16 +108,10 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private void init() throws Exception {
         //log
         logger.info("initializing......");
-        //load json to global config
-//        MagpieConfigJson jcnf = new MagpieConfigJson(jobId);
-//        JSONObject jRoot = jcnf.getJson();
-//        if(jRoot != null) {
-//            JSONObject jcontent = jRoot.getJSONObject("info").getJSONObject("content");
-//            config.username = jcontent.getString("Username");
-//            config.password = jcontent.getString("Password");
-//        }
-        //init test envrionment
-        config.testInit();
+        //id
+        config.jobId = jobId;
+        //init envrionment config (local,off-line,on-line)
+        config.initConfJSON();//config.initConfStatic();
         //generate the driver, interface etc.
         logConnector = new MysqlConnector(new InetSocketAddress(config.address, config.myPort),
                 config.username,
@@ -327,9 +321,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     if(counter % 10000 == 0) {
                         monitor.fetchEnd = System.currentTimeMillis();
                         logger.info("===================================> fetch thread : ");
-                        logger.info("---> fetch during time : " + (monitor.fetchEnd - monitor.fetchStart));
-                        logger.info("---> fetch number : " + counter);
-                        logger.info("---> fetch sum size : " + monitor.batchSize);
+                        logger.info("---> fetch during time : " + (monitor.fetchEnd - monitor.fetchStart) + " ms");
+                        logger.info("---> fetch number : " + counter + " events");
+                        logger.info("---> fetch sum size : " + monitor.batchSize / config.mbUnit + " MB");
                         monitor.clear();
                         counter = 0;
                     }
@@ -470,6 +464,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             if(entry != null) {
                 eventConvert.setBatchId(batchId);
                 eventConvert.setInId(inBatchId);
+                eventConvert.setIp(config.address);
                 inBatchId++;//batchId.inId almost point next event's position
                 if(isEndEvent(event)) {
                     inBatchId = 0;
@@ -492,7 +487,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //     so the mysqlbinlog:pos <--> batchId:inBatchId Do not must be same event to same event
         // mysqlbinlog:pos <- no filter list's xid  batchid:inBatchId <- filter list's last event
         //entryList data to kafka , per time must confirm the position
-        if(entryList.size() > config.batchsize || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
+        if(entryList.size() >= config.batchsize || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
             monitor.persisNum = entryList.size();
             persisteData(entryList);//send the data list to kafka
             confirmPos(lastEvent,binlog);//send the mysql pos batchid inbatchId to zk
@@ -501,10 +496,10 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         }
         if(monitor.persisNum > 0) {
             logger.info("===================================> persistence thread:");
-            logger.info("---> persistence deal during time:" + (monitor.persistenceEnd - monitor.persistenceStart));
-            logger.info("---> write kafka during time:" + (monitor.hbaseWriteEnd - monitor.hbaseWriteStart));
-            logger.info("---> the number of entry list: " + monitor.persisNum);
-            logger.info("---> entry list to bytes sum size is " + monitor.batchSize);
+            logger.info("---> persistence deal during time:" + (monitor.persistenceEnd - monitor.persistenceStart) + " ms");
+            logger.info("---> write kafka during time:" + (monitor.hbaseWriteEnd - monitor.hbaseWriteStart) + " ms");
+            logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
+            logger.info("---> entry list to bytes sum size is " + monitor.batchSize / config.mbUnit + " MB");
             if(lastEvent != null)
                 logger.info("---> position info:"+" binlog file is " + globalBinlogName +
                     ",position is :" + lastEvent.getLogPos() + "; batch id is :" + globalXidBatchId +
@@ -584,6 +579,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         tableConnector.disconnect();
         msgSender.close();
         zkExecutor.close();
+        config.clear();
     }
 
     class RetryTimesOutException extends Exception {

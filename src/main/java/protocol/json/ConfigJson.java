@@ -12,15 +12,21 @@ import java.util.HashMap;
 /**
  * Created by hp on 14-11-12.
  */
-public class MagpieConfigJson {
+public class ConfigJson {
 
     private String jsonStr;
     private String urlStr;
     private String loadFile = "input_config.yaml";
     private String jobId;
+    private String key = "magpie.address";
 
-    public MagpieConfigJson(String id) {
+    public ConfigJson(String id) {
         jobId = id;
+    }
+
+    public ConfigJson(String id, String getKey) {
+        jobId = id;
+        key = getKey;
     }
 
     private void getFile() {

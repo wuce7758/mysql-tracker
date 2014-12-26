@@ -2,7 +2,7 @@ package tracker;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.jd.bdp.magpie.MagpieExecutor;
-import protocol.json.MagpieConfigJson;
+import protocol.json.ConfigJson;
 import protocol.avro.EventEntryAvro;
 import tracker.common.TableMetaCache;
 import mysql.dbsync.DirectLogFetcherChannel;
@@ -177,7 +177,7 @@ public class HandlerNoParserMagpieHBase implements MagpieExecutor {
         //job id
         jobId = id;
         //adjust the config
-        MagpieConfigJson configJson = new MagpieConfigJson(id);
+        ConfigJson configJson = new ConfigJson(id);
         JSONObject jRoot = configJson.getJson();
         if(jRoot != null) {
             JSONObject jContent = jRoot.getJSONObject("info").getJSONObject("content");

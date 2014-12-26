@@ -1,5 +1,8 @@
 package tracker.utils;
 
+import net.sf.json.JSONObject;
+import protocol.json.ConfigJson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +25,7 @@ public class TrackerConf {
     public static String acks = "1";
     public static String topic = "test";//queue topic
     public static int partition = 0;
-    public static List<String> topics = new ArrayList<String>();//distribute the multiple topic
+    public static String strSeeds = "127.0.0.1";//"172.17.36.53,172.17.36.54,172.17.36.55";
     public static List<String> brokerSeeds = new ArrayList<String>();//"12,13,14"
     //zk conf
     public String zkServers = "127.0.0.1:2181";//"48:2181,19:2181,50:2181"
@@ -38,27 +41,54 @@ public class TrackerConf {
     public String filterRegex = ".*\\..*";
     public int minsec = 60;
     public int retrys = 100;//if we retry 100 connect or send failed too, we will reload the job
+    public double mbUnit = 1024.0 * 1024.0;
+    public String jobId = "mysql-tracker";
 
-//    static  {
-//        brokerSeeds.add("127.0.0.1");
-//    }
 
-//    public void testInit() {
-//        brokerSeeds.add("127.0.0.1");
-//    }
+    public void initConfLocal() {
+        brokerSeeds.add("127.0.0.1");
+    }
 
-    public void testInit() {
+    public void initConfStatic() {
         username = "jd_data";
         password = "jd_data";
         address = "172.17.36.48";
         myPort = 3306;
         brokerList = "172.17.36.53:9092,172.17.36.54:9092,172.17.36.55:9092";
-        brokerSeeds.add("172.17.36.53");
-        brokerSeeds.add("172.17.36.54");
-        brokerSeeds.add("172.17.36.55");
+        strSeeds = "172.17.36.53,172.17.36.54,172.17.36.55";
+        String ss[] = strSeeds.split(",");
+        for(String s : ss) {
+            brokerSeeds.add(s);
+        }
         kafkaPort = 9092;
         zkKafka = "172.17.36.60/kafka";
         topic = "mysql_log";
         zkServers = "172.17.36.60:2181,172.17.36.61:2181,172.17.36.62:2181";
+    }
+
+    public void initConfJSON() {
+        ConfigJson jcnf = new ConfigJson(jobId, "magpie.address");
+        JSONObject root = jcnf.getJson();
+        //parser the json
+        if(root != null) {
+            JSONObject data = root.getJSONObject("info").getJSONObject("content");
+            username = data.getString("username");
+            password = data.getString("password");
+            address = data.getString("address");
+            myPort = Integer.valueOf(data.getString("myPort"));
+            slaveId = Long.valueOf(data.getString("slaveId"));
+            brokerList = data.getString("brokerList");
+            kafkaPort = Integer.valueOf("kafkaPort");
+            zkKafka = data.getString("zkKafka");
+            topic = data.getString("topic");
+            strSeeds = data.getString("strSeeds");
+            zkServers = data.getString("zkServers");
+            filterRegex = data.getString("filterRegex");
+        }
+    }
+
+    //clear the conf info
+    public void clear() {
+        brokerSeeds.clear();
     }
 }

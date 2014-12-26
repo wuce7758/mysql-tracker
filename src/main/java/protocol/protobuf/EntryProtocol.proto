@@ -1,6 +1,6 @@
-package tracker.utils;
+package protocol.protobuf;
 
-option java_package = "tracker.utils";
+option java_package = "protocol.protobuf";
 option java_outer_classname = "CanalEntry";
 option optimize_for = SPEED;
 
@@ -23,6 +23,9 @@ message Entry {
 
 	/**additional info**/
 	optional int64						inId				= 5;
+
+	/**additional info**/
+	optional string						ip					= 6;
 }
 
 /**message Header**/
