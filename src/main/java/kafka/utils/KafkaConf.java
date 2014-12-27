@@ -12,6 +12,7 @@ public class KafkaConf {
     public static int port = 9092;
     public static String zk = "localhost:2181";
     public static String serializer = "kafka.serializer.DefaultEncoder";//default is byte[]
+    public static String keySerializer = "kafka.serializer.StringEncoder";//default is message's byte[]
     public static String partitioner = "kafka.producer.DefaultPartitioner";
     public static String acks = "1";
     public static String topic;//queue topic

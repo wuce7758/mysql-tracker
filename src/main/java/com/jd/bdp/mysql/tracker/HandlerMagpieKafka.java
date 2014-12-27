@@ -1,4 +1,4 @@
-package tracker;
+package com.jd.bdp.mysql.tracker;
 
 import com.jd.bdp.magpie.MagpieExecutor;
 import filter.FilterMatcher;

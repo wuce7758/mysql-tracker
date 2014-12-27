@@ -21,6 +21,7 @@ public class TrackerConf {
     public static int kafkaPort = 9092;
     public static String zkKafka = "localhost:2181";
     public static String serializer = "kafka.serializer.DefaultEncoder";//default is byte[]
+    public static String keySerializer = "kafka.serializer.StringEncoder";
     public static String partitioner = "kafka.producer.DefaultPartitioner";
     public static String acks = "1";
     public static String topic = "test";//queue topic
@@ -78,7 +79,7 @@ public class TrackerConf {
             myPort = Integer.valueOf(data.getString("myPort"));
             slaveId = Long.valueOf(data.getString("slaveId"));
             brokerList = data.getString("brokerList");
-            kafkaPort = Integer.valueOf("kafkaPort");
+            kafkaPort = Integer.valueOf(data.getString("kafkaPort"));
             zkKafka = data.getString("zkKafka");
             topic = data.getString("topic");
             strSeeds = data.getString("strSeeds");

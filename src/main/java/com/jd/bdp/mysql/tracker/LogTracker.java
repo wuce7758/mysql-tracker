@@ -1,7 +1,6 @@
 package com.jd.bdp.mysql.tracker;
 
 import com.jd.bdp.magpie.Topology;
-import tracker.HandlerMagpieKafka;
 
 /**
  * Created by hp on 14-9-22.

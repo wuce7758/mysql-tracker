@@ -1,5 +1,6 @@
 package protocol.json;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONTokener;
 import org.ho.yaml.Yaml;
@@ -66,6 +67,15 @@ public class ConfigJson {
         JSONTokener jsonParser = new JSONTokener(jsonStr);
         JSONObject jsonOb = (JSONObject)jsonParser.nextValue();
         return jsonOb;
+    }
+
+    public JSONArray getJsonArr() {
+        getFile();
+        getJsonStr();
+        JSONTokener jsonParser = new JSONTokener(jsonStr);
+        System.out.println("json string : " + jsonStr);
+        JSONArray ja = (JSONArray) jsonParser.nextValue();
+        return ja;
     }
 
 }
