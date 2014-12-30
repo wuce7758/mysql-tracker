@@ -44,7 +44,7 @@ public class TrackerConf {
     public int retrys = 100;//if we retry 100 connect or send failed too, we will reload the job
     public double mbUnit = 1024.0 * 1024.0;
     public String jobId = "mysql-tracker";
-    public int spacesize = 10;//10 MB
+    public int spacesize = 8;//8 MB
 
 
     public void initConfLocal() {

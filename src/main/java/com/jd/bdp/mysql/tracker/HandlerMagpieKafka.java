@@ -1,5 +1,6 @@
 package com.jd.bdp.mysql.tracker;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.jd.bdp.magpie.MagpieExecutor;
 import filter.FilterMatcher;
 import kafka.driver.producer.KafkaSender;
@@ -69,7 +70,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     //zk
     private ZkExecutor zkExecutor;
     //blocking queue
-    private BlockingQueue<LogEvent> eventQueue;
+    private BlockingQueue<CanalEntry.Entry> entryQueue;
     //batch id and in batch id
     private long batchId = 0;
     private long inBatchId = 0;
@@ -77,6 +78,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private int globalFetchThread = 0;
     //global var
     private LogEvent globalXidEvent = null;
+    private CanalEntry.Entry globalXidEntry = null;
     private String globalBinlogName = "null";
     private long globalXidBatchId = -1;
     private long globalXidInBatchId = -1;
@@ -93,17 +95,10 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     //global var
     private List<CanalEntry.Entry> entryList;//filtered
     private LogEvent lastEvent = null;//get the eventList's last xid event
+    private CanalEntry.Entry lastEntry = null;
     private String binlog = null;
     private List<KeyedMessage<String, byte[]>> messageList;
     //debug var
-    private long queueUse = 0;
-    private long fetchUse = 0;
-    private long decodeUse = 0;
-    private long getUse = 0;
-    private long putUse = 0;
-    private long takeUse = 0;
-    private long parseUse = 0;
-    private long addUse = 0;
 
     //delay time
     private void delay(int sec) {
@@ -157,7 +152,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //table meta cache
         tableMetaCache = new TableMetaCache(tableConnector);
         //queue
-        eventQueue = new LinkedBlockingQueue<LogEvent>(config.queuesize);
+        entryQueue = new LinkedBlockingQueue<CanalEntry.Entry>(config.queuesize);
         //kafka
         KafkaConf kcnf = new KafkaConf();
         kcnf.brokerList = config.brokerList;
@@ -192,7 +187,6 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //event convert
         eventConvert = new LogEventConvert();
         eventConvert.setTableMetaCache(tableMetaCache);
-        eventConvert.filter = fm;
         //start time configuration
         startTime = System.currentTimeMillis();
         //global fetch thread
@@ -319,52 +313,30 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             try {
                 init();
                 int counter = 0;
-                long starts = 0;
-                long ends = 0;
-                starts = System.currentTimeMillis();
                 while (fetcher.fetch()) {
-                    ends = System.currentTimeMillis();
-                    fetchUse += (ends - starts);
                     if (counter == 0) monitor.fetchStart = System.currentTimeMillis();
-                    starts = System.currentTimeMillis();
                     event = decoder.decode(fetcher, context);
-                    ends = System.currentTimeMillis();
-                    decodeUse += (ends - starts);
                     if(event == null) {
                         logger.warn("fetched event is null...");
                         continue;
                     }
+                    //entry to event
+                    CanalEntry.Entry entry = eventConvert.parse(event);
+                    if(entry == null) continue;
+                    //add the entry to the queue
+                    entryQueue.put(entry);
                     counter++;
-                    starts = System.currentTimeMillis();
                     monitor.batchSize += event.getEventLen();
-                    ends = System.currentTimeMillis();
-                    getUse += (ends - starts);
-                    //add the event to the queue
-                    starts = System.currentTimeMillis();
-                    eventQueue.put(event);
-                    ends = System.currentTimeMillis();
-                    putUse += (ends - starts);
                     if(counter >= config.batchsize) {
                         monitor.fetchEnd = System.currentTimeMillis();
                         logger.info("===================================> fetch thread : ");
                         logger.info("---> fetch during time : " + (monitor.fetchEnd - monitor.fetchStart) + " ms");
-                        logger.info("#### fetch() use :" + fetchUse + " ms," +
-                                "decode use:" + decodeUse + " ms," +
-                                getUse + " ms(getUse)," + putUse + " ms(put)");
                         logger.info("---> fetch number : " + counter + " events");
                         logger.info("---> fetch sum size : " + monitor.batchSize / config.mbUnit + " MB");
                         monitor.clear();
                         counter = 0;
-                        fetchUse = 0;
-                        decodeUse = 0;
-                        getUse = 0;
-                        putUse = 0;
                     }
                     if(iskilled) break;
-                    starts = System.currentTimeMillis();
-                    if(eventQueue.size() >= 45000) {
-                        logger.info("######## queue size :" + eventQueue.size());
-                    }
                 }
             } catch (Exception e) {
                 if(iskilled) return;
@@ -434,9 +406,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             String date = sdfDate.format(cal.getTime());
             String xidValue = null;
             long pos = -1;
-            if(globalXidEvent != null) {
-                pos = globalXidEvent.getLogPos();
-                xidValue = globalBinlogName + ":" + globalXidEvent.getLogPos() + ":" + globalXidBatchId + ":" + globalXidInBatchId;
+            if(globalXidEntry != null) {
+                pos = globalXidEntry.getHeader().getLogfileOffset() + globalXidEntry.getHeader().getEventLength();
+                xidValue = globalBinlogName + ":" + pos + ":" + globalXidBatchId + ":" + globalXidInBatchId;
             } else {
                 pos = -1;
                 xidValue = globalBinlogName + ":" + "-1" + ":" + globalXidBatchId + ":" + globalXidInBatchId;
@@ -452,6 +424,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                logger.error("minute time err: " + e.getMessage());
                 logger.error(e.getMessage());
                 boolean isconn = false;
                 int retryZk = 0;
@@ -493,30 +466,30 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             delay(5);
             return;
         }
-        long starts = 0;
-        long ends = 0;
         //take the data from the queue
-        starts = System.currentTimeMillis();
-        while (!eventQueue.isEmpty()) {
-            long startt = 0;
-            long endt = 0;
-            startt = System.currentTimeMillis();
-            LogEvent event = eventQueue.take();
-            endt = System.currentTimeMillis();
-            takeUse += (endt - startt);
-            if(event == null) continue;
-            if(isEndEvent(event)) lastEvent = event;
-            eventConvert.setBatchId(batchId);
-            eventConvert.setInId(inBatchId);
-            eventConvert.setIp(config.address);
-            startt = System.currentTimeMillis();
-            CanalEntry.Entry entry = eventConvert.parse(event);
-            endt = System.currentTimeMillis();
-            parseUse += (endt - startt);
-            if(entry != null) {
-                startt = System.currentTimeMillis();
+        while (!entryQueue.isEmpty()) {
+            CanalEntry.Entry entry = entryQueue.take();
+            if(entry == null) continue;
+            if(isEndEntry(entry)) lastEntry = entry;
+            if(entry == lastEntry) {
+                binlog = eventConvert.getBinlogFileName();
+                globalBinlogName = binlog;
+                globalXidEntry = lastEntry;
+                globalXidBatchId = batchId;
+                globalXidInBatchId = inBatchId;
+            }
+            if(fm.isMatch(entry.getHeader().getSchemaName()+"."+entry.getHeader().getTableName())) {
+                // re-pack the entry
+                CanalEntry.Entry.Builder builder = CanalEntry.Entry.newBuilder();
+                builder.setHeader(entry.getHeader());
+                builder.setEntryType(entry.getEntryType());
+                builder.setStoreValue(entry.getStoreValue());
+                builder.setBatchId(batchId);
+                builder.setInId(inBatchId);
+                builder.setIp(config.address);
+                entry = builder.build();
                 inBatchId++;//batchId.inId almost point next event's position
-                if(isEndEvent(event)) {
+                if(isEndEntry(entry)) {
                     inBatchId = 0;
                     batchId++;
                 }
@@ -524,48 +497,33 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 monitor.batchSize += value.length;
                 KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.topic, null, value);
                 messageList.add(km);
-                endt = System.currentTimeMillis();
-                addUse += (endt - startt);
             }
-            if(event == lastEvent) {
-                binlog = eventConvert.getBinlogFileName();
-                globalBinlogName = binlog;
-                globalXidEvent = event;
-                globalXidBatchId = batchId;
-                globalXidInBatchId = inBatchId;
-            }
-            if(messageList.size() >= config.batchsize) break;
+            if(messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) break;
         }
-        ends = System.currentTimeMillis();
-        queueUse += (ends - starts);
         // serialize the list -> filter -> batch for it -> send the batched bytes to the kafka; persistence the batched list???
         // or no batched list???
         // I got it : mysqlbinlog:pos could be no filtered event but batchId and inBatchId must be filtered event
         //     so the mysqlbinlog:pos <--> batchId:inBatchId Do not must be same event to same event
         // mysqlbinlog:pos <- no filter list's xid  batchid:inBatchId <- filter list's last event
         //entryList data to kafka , per time must confirm the position
-        if(messageList.size() >= config.batchsize || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
+        if((messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
             monitor.persisNum = messageList.size();
             persisteKeyMsg(messageList);
-            confirmPos(lastEvent,binlog);//send the mysql pos batchid inbatchId to zk
+            confirmPos(lastEntry,binlog);//send the mysql pos batchid inbatchId to zk
             messageList.clear();
         }
         if(monitor.persisNum > 0) {
             logger.info("===================================> persistence thread:");
             logger.info("---> persistence deal during time:" + (monitor.persistenceEnd - monitor.persistenceStart) + " ms");
-            logger.info("#### queue use:" + queueUse + " ms," + takeUse + " ms(take)," +
-                    parseUse + " ms(parse)," + addUse + " ms(add)");
             logger.info("---> write kafka during time:" + (monitor.hbaseWriteEnd - monitor.hbaseWriteStart) + " ms");
             logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
             logger.info("---> entry list to bytes sum size is " + monitor.batchSize / config.mbUnit + " MB");
-            if(lastEvent != null)
+            if(lastEntry != null)
                 logger.info("---> position info:"+" binlog file is " + globalBinlogName +
-                        ",position is :" + lastEvent.getLogPos() + "; batch id is :" + globalXidBatchId +
+                        ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
                         ",in batch id is :" + globalXidInBatchId);
             monitor.clear();
             startTime = System.currentTimeMillis();
-            queueUse = 0;
-            takeUse = parseUse = addUse = 0;
         }
     }
 
@@ -619,6 +577,33 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         }
     }
 
+    private void confirmPos(CanalEntry.Entry entry, String bin) throws Exception {
+        if(entry != null) {
+            String pos = bin + ":" + (entry.getHeader().getLogfileOffset() + entry.getHeader().getEventLength()) + ":" + batchId + ":" + inBatchId;
+            try {
+                zkExecutor.set(config.persisPath, pos);
+            } catch (Exception e) { //retry
+                logger.error(e.getMessage());
+                boolean isconn = false;
+                int isZk = 0;
+                while (!isconn) {
+                    if(isZk >= config.retrys) {
+                        globalFetchThread = 1;
+                        return;
+                    }
+                    isZk++;
+                    try {
+                        zkExecutor.set(config.persisPath, pos);
+                        isconn = true;
+                    } catch (Exception e1) {
+                        logger.error("retrying...... Exception:" +e1.getMessage());
+                        delay(3);
+                    }
+                }
+            }
+        }
+    }
+
     private boolean isEndEvent(LogEvent event){
         if((event.getHeader().getType()==LogEvent.XID_EVENT)
                 ||(event.getHeader().getType()==LogEvent.QUERY_EVENT
@@ -626,6 +611,18 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             return (true);
         }
         else    return(false);
+    }
+
+    //maybe bug because of getisddl() best is !(BEGIN || COMMIT)
+    private boolean isEndEntry(CanalEntry.Entry entry) {
+        try {
+            if (entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONEND) return true;
+            CanalEntry.RowChange rc = CanalEntry.RowChange.parseFrom(entry.getStoreValue());
+            if(rc.getIsDdl() && entry.getEntryType() == CanalEntry.EntryType.ROWDATA) return true;
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void pause(String id) throws Exception {

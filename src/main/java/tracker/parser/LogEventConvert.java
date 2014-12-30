@@ -1,7 +1,6 @@
 package tracker.parser;
 
 import com.google.protobuf.ByteString;
-import filter.FilterMatcher;
 import mysql.dbsync.LogEvent;
 import mysql.dbsync.event.DeleteRowsLogEvent;
 import mysql.dbsync.event.IntvarLogEvent;
@@ -22,13 +21,13 @@ import mysql.dbsync.event.mariadb.AnnotateRowsEvent;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import protocol.protobuf.CanalEntry;
 import tracker.common.AviaterRegexFilter;
 import tracker.common.CanalParseException;
 import tracker.common.TableMeta;
 import tracker.common.TableMeta.FieldMeta;
 import tracker.common.TableMetaCache;
 import tracker.parser.SimpleDdlParser.DdlResult;
-import protocol.protobuf.CanalEntry;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -72,7 +71,6 @@ public class LogEventConvert {
     //additional info
     private static long                 batchId             = 0;
     private static long                 inId                = 0;
-    public FilterMatcher                filter              = new FilterMatcher();
     private static String               ip                  = "";
 
 
@@ -161,7 +159,6 @@ public class LogEventConvert {
 
             String tableName = result.getTableName();
             //additional filter
-            if(!filter.isMatch(schemaName+"."+tableName)) return null;
             CanalEntry.EventType type = CanalEntry.EventType.QUERY;
             // fixed issue https://github.com/alibaba/canal/issues/58
             if (result.getType() == CanalEntry.EventType.ALTER || result.getType() == CanalEntry.EventType.ERASE
@@ -298,8 +295,6 @@ public class LogEventConvert {
             }
 
             String fullname = table.getDbName() + "." + table.getTableName();
-            //additional filter
-            if(!filter.isMatch(fullname)) return null;
             // check name filter
             if (nameFilter != null && !nameFilter.filter(fullname)) {
                 return null;
@@ -353,7 +348,6 @@ public class LogEventConvert {
                         rowChangeBuider.addRowDatas(rowDataBuilder.build());
                         break;
                     }
-
                     parseOneRow(rowDataBuilder, event, buffer, event.getChangeColumns(), true, tableMeta);
                 }
 
