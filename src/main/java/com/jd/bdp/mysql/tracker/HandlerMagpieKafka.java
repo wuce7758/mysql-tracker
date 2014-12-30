@@ -3,6 +3,7 @@ package com.jd.bdp.mysql.tracker;
 import com.jd.bdp.magpie.MagpieExecutor;
 import filter.FilterMatcher;
 import kafka.driver.producer.KafkaSender;
+import kafka.producer.KeyedMessage;
 import kafka.utils.KafkaConf;
 import monitor.TrackerMonitor;
 import mysql.dbsync.DirectLogFetcherChannel;
@@ -93,7 +94,16 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private List<CanalEntry.Entry> entryList;//filtered
     private LogEvent lastEvent = null;//get the eventList's last xid event
     private String binlog = null;
-
+    private List<KeyedMessage<String, byte[]>> messageList;
+    //debug var
+    private long queueUse = 0;
+    private long fetchUse = 0;
+    private long decodeUse = 0;
+    private long getUse = 0;
+    private long putUse = 0;
+    private long takeUse = 0;
+    private long parseUse = 0;
+    private long addUse = 0;
 
     //delay time
     private void delay(int sec) {
@@ -198,6 +208,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         inBatchId = 0;
         //global var
         entryList = new ArrayList<CanalEntry.Entry>();
+        messageList = new ArrayList<KeyedMessage<String, byte[]>>();
     }
 
     private void initZk() throws Exception {
@@ -253,8 +264,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 batchId = 0;
                 inBatchId = 0;
                 logger.info("start position :" + returnPos.getBinlogPosFileName()+":"+returnPos.getPosition()+
-                ":"+batchId+
-                ":"+inBatchId);
+                        ":"+batchId+
+                        ":"+inBatchId);
                 return returnPos;
             }
             String[] ss = getStr.split(":");
@@ -267,9 +278,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             returnPos = new EntryPosition(ss[0], Long.valueOf(ss[1]));
             batchId = Long.valueOf(ss[2]);
             inBatchId = Long.valueOf(ss[3]);
-            logger.info("start position :" + returnPos.getBinlogPosFileName()+":"+returnPos.getPosition()+
-                    ":"+batchId+
-                    ":"+inBatchId);
+            logger.info("start position :" + returnPos.getBinlogPosFileName() + ":" + returnPos.getPosition() +
+                    ":" + batchId +
+                    ":" + inBatchId);
         } catch (Exception e) {
             logger.error("zk client error : " + e.getMessage());
             e.printStackTrace();
@@ -308,29 +319,55 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             try {
                 init();
                 int counter = 0;
+                long starts = 0;
+                long ends = 0;
+                starts = System.currentTimeMillis();
                 while (fetcher.fetch()) {
+                    ends = System.currentTimeMillis();
+                    fetchUse += (ends - starts);
                     if (counter == 0) monitor.fetchStart = System.currentTimeMillis();
+                    starts = System.currentTimeMillis();
                     event = decoder.decode(fetcher, context);
+                    ends = System.currentTimeMillis();
+                    decodeUse += (ends - starts);
                     if(event == null) {
                         logger.warn("fetched event is null...");
                         continue;
                     }
                     counter++;
+                    starts = System.currentTimeMillis();
                     monitor.batchSize += event.getEventLen();
+                    ends = System.currentTimeMillis();
+                    getUse += (ends - starts);
                     //add the event to the queue
+                    starts = System.currentTimeMillis();
                     eventQueue.put(event);
-                    if(counter % 10000 == 0) {
+                    ends = System.currentTimeMillis();
+                    putUse += (ends - starts);
+                    if(counter >= config.batchsize) {
                         monitor.fetchEnd = System.currentTimeMillis();
                         logger.info("===================================> fetch thread : ");
                         logger.info("---> fetch during time : " + (monitor.fetchEnd - monitor.fetchStart) + " ms");
+                        logger.info("#### fetch() use :" + fetchUse + " ms," +
+                                "decode use:" + decodeUse + " ms," +
+                                getUse + " ms(getUse)," + putUse + " ms(put)");
                         logger.info("---> fetch number : " + counter + " events");
                         logger.info("---> fetch sum size : " + monitor.batchSize / config.mbUnit + " MB");
                         monitor.clear();
                         counter = 0;
+                        fetchUse = 0;
+                        decodeUse = 0;
+                        getUse = 0;
+                        putUse = 0;
                     }
                     if(iskilled) break;
+                    starts = System.currentTimeMillis();
+                    if(eventQueue.size() >= 45000) {
+                        logger.info("######## queue size :" + eventQueue.size());
+                    }
                 }
             } catch (Exception e) {
+                if(iskilled) return;
                 logger.error("fetch thread error : " + e.getMessage());
                 e.printStackTrace();
                 String errMsg = e.getMessage();
@@ -456,22 +493,39 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             delay(5);
             return;
         }
+        long starts = 0;
+        long ends = 0;
         //take the data from the queue
+        starts = System.currentTimeMillis();
         while (!eventQueue.isEmpty()) {
+            long startt = 0;
+            long endt = 0;
+            startt = System.currentTimeMillis();
             LogEvent event = eventQueue.take();
+            endt = System.currentTimeMillis();
+            takeUse += (endt - startt);
             if(event == null) continue;
             if(isEndEvent(event)) lastEvent = event;
+            eventConvert.setBatchId(batchId);
+            eventConvert.setInId(inBatchId);
+            eventConvert.setIp(config.address);
+            startt = System.currentTimeMillis();
             CanalEntry.Entry entry = eventConvert.parse(event);
+            endt = System.currentTimeMillis();
+            parseUse += (endt - startt);
             if(entry != null) {
-                eventConvert.setBatchId(batchId);
-                eventConvert.setInId(inBatchId);
-                eventConvert.setIp(config.address);
+                startt = System.currentTimeMillis();
                 inBatchId++;//batchId.inId almost point next event's position
                 if(isEndEvent(event)) {
                     inBatchId = 0;
                     batchId++;
                 }
-                entryList.add(CanalEntry.Entry.newBuilder(entry).build());//build or new object
+                byte[] value = entry.toByteArray();
+                monitor.batchSize += value.length;
+                KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.topic, null, value);
+                messageList.add(km);
+                endt = System.currentTimeMillis();
+                addUse += (endt - startt);
             }
             if(event == lastEvent) {
                 binlog = eventConvert.getBinlogFileName();
@@ -480,32 +534,38 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 globalXidBatchId = batchId;
                 globalXidInBatchId = inBatchId;
             }
-            if(entryList.size() >= config.batchsize) break;
+            if(messageList.size() >= config.batchsize) break;
         }
+        ends = System.currentTimeMillis();
+        queueUse += (ends - starts);
         // serialize the list -> filter -> batch for it -> send the batched bytes to the kafka; persistence the batched list???
         // or no batched list???
         // I got it : mysqlbinlog:pos could be no filtered event but batchId and inBatchId must be filtered event
         //     so the mysqlbinlog:pos <--> batchId:inBatchId Do not must be same event to same event
         // mysqlbinlog:pos <- no filter list's xid  batchid:inBatchId <- filter list's last event
         //entryList data to kafka , per time must confirm the position
-        if(entryList.size() >= config.batchsize || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
-            monitor.persisNum = entryList.size();
-            persisteData(entryList);//send the data list to kafka
+        if(messageList.size() >= config.batchsize || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
+            monitor.persisNum = messageList.size();
+            persisteKeyMsg(messageList);
             confirmPos(lastEvent,binlog);//send the mysql pos batchid inbatchId to zk
-            startTime = System.currentTimeMillis();
-            entryList.clear();
+            messageList.clear();
         }
         if(monitor.persisNum > 0) {
             logger.info("===================================> persistence thread:");
             logger.info("---> persistence deal during time:" + (monitor.persistenceEnd - monitor.persistenceStart) + " ms");
+            logger.info("#### queue use:" + queueUse + " ms," + takeUse + " ms(take)," +
+                    parseUse + " ms(parse)," + addUse + " ms(add)");
             logger.info("---> write kafka during time:" + (monitor.hbaseWriteEnd - monitor.hbaseWriteStart) + " ms");
             logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
             logger.info("---> entry list to bytes sum size is " + monitor.batchSize / config.mbUnit + " MB");
             if(lastEvent != null)
                 logger.info("---> position info:"+" binlog file is " + globalBinlogName +
-                    ",position is :" + lastEvent.getLogPos() + "; batch id is :" + globalXidBatchId +
-                    ",in batch id is :" + globalXidInBatchId);
+                        ",position is :" + lastEvent.getLogPos() + "; batch id is :" + globalXidBatchId +
+                        ",in batch id is :" + globalXidInBatchId);
             monitor.clear();
+            startTime = System.currentTimeMillis();
+            queueUse = 0;
+            takeUse = parseUse = addUse = 0;
         }
     }
 
@@ -524,6 +584,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         }
         monitor.hbaseWriteEnd = System.currentTimeMillis();
 
+    }
+
+    private void persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
+        monitor.persistenceStart = System.currentTimeMillis();
+        msgSender.sendKeyMsg(msgs);
+        monitor.persistenceEnd = System.currentTimeMillis();
     }
 
     private void confirmPos(LogEvent last, String bin) throws Exception {
