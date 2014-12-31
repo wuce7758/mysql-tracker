@@ -337,6 +337,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         counter = 0;
                     }
                     if(iskilled) break;
+                    if(entryQueue.size() >= config.queuesize) logger.info("###---blocking......");
                 }
             } catch (Exception e) {
                 if(iskilled) return;
@@ -515,7 +516,6 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         if(monitor.persisNum > 0) {
             logger.info("===================================> persistence thread:");
             logger.info("---> persistence deal during time:" + (monitor.persistenceEnd - monitor.persistenceStart) + " ms");
-            logger.info("---> write kafka during time:" + (monitor.hbaseWriteEnd - monitor.hbaseWriteStart) + " ms");
             logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
             logger.info("---> entry list to bytes sum size is " + monitor.batchSize / config.mbUnit + " MB");
             if(lastEntry != null)
