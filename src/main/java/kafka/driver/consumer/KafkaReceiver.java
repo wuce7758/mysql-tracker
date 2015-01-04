@@ -47,9 +47,9 @@ public class KafkaReceiver extends Thread {
     private KafkaConf conf;
     private List<String> replicaBrokers = new ArrayList<String>();
     public static int retry = 3;
-    private SimpleConsumer consumer;
-    public BlockingQueue<KafkaMetaMsg> msgQueue;
     private int MAXLEN = 10000;
+    private SimpleConsumer consumer;
+    public BlockingQueue<KafkaMetaMsg> msgQueue = new LinkedBlockingQueue<KafkaMetaMsg>(MAXLEN);//outer interface, outer read data from this queue.
     public boolean isFetch = true;
 
     public KafkaReceiver(KafkaConf cnf) {
@@ -126,7 +126,6 @@ public class KafkaReceiver extends Thread {
     }
 
     public void run() {
-        msgQueue = new LinkedBlockingQueue<KafkaMetaMsg>(MAXLEN);
         PartitionMetadata metadata = findLeader(conf.brokerSeeds, conf.port, conf.topic, conf.partition);
         if(metadata == null) {
             logger.error("Can't find metadata for Topic and Partition. Existing");
@@ -147,7 +146,7 @@ public class KafkaReceiver extends Thread {
             }
             FetchRequest req = new FetchRequestBuilder()
                     .clientId(clientName)
-                    .addFetch(conf.topic, conf.partition, readOffset, 100000)
+                    .addFetch(conf.topic, conf.partition, readOffset, conf.readBufferSize)
                     .build();
             FetchResponse rep = consumer.fetch(req);
             if(rep.hasError()) {
@@ -207,5 +206,22 @@ public class KafkaReceiver extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isConnected() {
+        SimpleConsumer hconsumer = null;
+        try {
+            for (String broker : conf.brokerSeeds) {
+                hconsumer = new SimpleConsumer(broker, conf.port, 100000, 64 * 1024, "heartBeat");
+                List<String> topics = Collections.singletonList(conf.topic);
+                TopicMetadataRequest req = new TopicMetadataRequest(topics);
+                TopicMetadataResponse rep = hconsumer.send(req);
+            }
+            if(hconsumer != null) hconsumer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

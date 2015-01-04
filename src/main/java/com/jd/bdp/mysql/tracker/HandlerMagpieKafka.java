@@ -90,6 +90,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     Fetcher fetcher;
     Timer timer;
     Minuter minter;
+    Timer htimer;
+    HeartBeat heartBeat;
     //monitor
     private TrackerMonitor monitor;
     //global var
@@ -158,6 +160,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         kcnf.brokerList = config.brokerList;
         kcnf.port = config.kafkaPort;
         kcnf.topic = config.topic;
+        kcnf.acks = config.acks;
         msgSender = new KafkaSender(kcnf);
         msgSender.connect();
         //zk
@@ -195,6 +198,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         fetcher = new Fetcher();
         timer = new Timer();
         minter = new Minuter();
+        htimer = new Timer();
+        heartBeat = new HeartBeat();
         //monitor
         monitor = new TrackerMonitor();
         //batch id
@@ -294,6 +299,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //start thread
         fetcher.start();
         timer.schedule(minter, 1000, config.minsec * 1000);
+        htimer.schedule(heartBeat, 1000, config.heartsec * 1000);
         //log
         logger.info("start the tracker successfully......");
         delay(3);//waiting threads start
@@ -337,7 +343,6 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         counter = 0;
                     }
                     if(iskilled) break;
-                    if(entryQueue.size() >= config.queuesize) logger.info("###---blocking......");
                 }
             } catch (Exception e) {
                 if(iskilled) return;
@@ -346,7 +351,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 String errMsg = e.getMessage();
                 if(errMsg.contains("errno = 1236")) {
                     try {
-                        zkExecutor.delete(config.persisPath);
+                        zkExecutor.delete(config.persisPath);//invalid position
                     } catch (Exception e1) {
                         logger.error(e1.getMessage());
                         e1.printStackTrace();
@@ -455,6 +460,52 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             logger.info("---> binlog file is " + globalBinlogName +
                     ",position is :" + pos + "; batch id is :" + globalXidBatchId +
                     ",in batch id is :" + globalXidInBatchId);
+        }
+    }
+
+    class HeartBeat extends TimerTask {
+        private Logger logger = LoggerFactory.getLogger(HeartBeat.class);
+
+        public void run() {
+            logger.info("=================================> check assembly heartbeats......");
+            //check mysql connection heartbeat
+            if(!logConnector.isConnected() || !tableConnector.isConnected() || !realConnector.isConnected()) {
+                logger.info("mysql connection loss, reload the job ......");
+                globalFetchThread = 1;
+                return;
+            }
+            //check mysql connection further
+            if(!isMysqlConnected()) {
+                logger.info("mysql connection loss, reload the job ......");
+                globalFetchThread = 1;
+                return;
+            }
+            //check kafka sender
+            if(!msgSender.isConnected()) {
+                logger.info("kafka producer connection loss, reload the job ......");
+                globalFetchThread = 1;
+                return;
+            }
+            //check zk connection
+            if(!zkExecutor.isConnected()) {
+                logger.info("zookeeper connection loss, reload the job ......");
+                globalFetchThread = 1;
+                return;
+            }
+        }
+
+        private boolean isMysqlConnected() {
+            MysqlConnector hconn = null;
+            try {
+                hconn = new MysqlConnector(new InetSocketAddress(config.address, config.myPort),
+                        config.username,
+                        config.password);
+                hconn.connect();
+                hconn.disconnect();
+            } catch (IOException e) {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -637,7 +688,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     public void close(String id) throws Exception {
         fetcher.iskilled = true;//stop the fetcher thread
         minter.cancel();//stop the per minute record
+        heartBeat.cancel();//stop the heart beat thread
         timer.cancel();
+        htimer.cancel();
         logConnector.disconnect();
         realConnector.disconnect();
         tableConnector.disconnect();

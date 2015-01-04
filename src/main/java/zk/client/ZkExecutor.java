@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import zk.utils.ZkConf;
 
+import java.io.IOException;
+
 /**
  * Created by hp on 14-12-12.
  */
@@ -65,5 +67,27 @@ public class ZkExecutor {
         if(exists(path)) {
             zk.delete(path, -1);
         }
+    }
+
+    public boolean isConnected() {
+        ZooKeeper heartzk = null;
+        try {
+            heartzk = new ZooKeeper(conf.zkServers, conf.timeout, new Watcher() {
+                @Override
+                public void process(WatchedEvent event) {
+                    logger.info("watcher : " + event.getType());
+                }
+            });
+            if(heartzk!=null) {
+                try {
+                    heartzk.close();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 }

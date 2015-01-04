@@ -125,4 +125,22 @@ public class KafkaSender {
         close();
         connect();
     }
+
+    public boolean isConnected() {
+        Properties prop = new Properties();
+        prop.put("metadata.broker.list", conf.brokerList);
+        prop.put("serializer.class", conf.serializer);//msg is string
+        prop.put("key.serializer.class", conf.keySerializer);
+        prop.put("partitioner.class", conf.partitioner);
+        prop.put("request.required.acks", conf.acks);
+        ProducerConfig pConfig = new ProducerConfig(prop);
+        Producer<String, byte[]> heartPro = null;
+        try {
+            heartPro = new Producer<String, byte[]>(pConfig);
+            if(heartPro != null) heartPro.close();
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -19,5 +19,6 @@ public class KafkaConf {
     public static int partition = 0;
     public static List<String> topics = new ArrayList<String>();//distribute the multiple topic
     public static List<String> brokerSeeds = new ArrayList<String>();//"12,13,14"
-
+    public static int readBufferSize = 1 * 1024 * 1024;//1 MB
+    public static String clientName = "cc456687IUGHG";
 }

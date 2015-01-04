@@ -23,7 +23,7 @@ public class TrackerConf {
     public static String serializer = "kafka.serializer.DefaultEncoder";//default is byte[]
     public static String keySerializer = "kafka.serializer.StringEncoder";
     public static String partitioner = "kafka.producer.DefaultPartitioner";
-    public static String acks = "1";
+    public static String acks = "3";
     public static String topic = "test";//queue topic
     public static int partition = 0;
     public static String strSeeds = "127.0.0.1";//"172.17.36.53,172.17.36.54,172.17.36.55";
@@ -41,6 +41,7 @@ public class TrackerConf {
     public int timeInterval = 1;
     public String filterRegex = ".*\\..*";
     public int minsec = 60;
+    public int heartsec = 5 * 60;
     public int retrys = 100;//if we retry 100 connect or send failed too, we will reload the job
     public double mbUnit = 1024.0 * 1024.0;
     public String jobId = "mysql-tracker";
