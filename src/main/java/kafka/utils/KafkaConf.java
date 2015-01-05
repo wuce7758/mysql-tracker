@@ -15,6 +15,7 @@ public class KafkaConf {
     public static String keySerializer = "kafka.serializer.StringEncoder";//default is message's byte[]
     public static String partitioner = "kafka.producer.DefaultPartitioner";
     public static String acks = "1";
+    public static String sendBufferSize = String.valueOf(1024 * 1024);//1MB
     public static String topic;//queue topic
     public static int partition = 0;
     public static List<String> topics = new ArrayList<String>();//distribute the multiple topic

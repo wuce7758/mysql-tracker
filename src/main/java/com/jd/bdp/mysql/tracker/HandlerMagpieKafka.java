@@ -559,6 +559,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         // mysqlbinlog:pos <- no filter list's xid  batchid:inBatchId <- filter list's last event
         //entryList data to kafka , per time must confirm the position
         if((messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
+            if(messageList.size() == 0) return;
             monitor.persisNum = messageList.size();
             persisteKeyMsg(messageList);
             confirmPos(lastEntry,binlog);//send the mysql pos batchid inbatchId to zk

@@ -133,6 +133,7 @@ public class KafkaSender {
         prop.put("key.serializer.class", conf.keySerializer);
         prop.put("partitioner.class", conf.partitioner);
         prop.put("request.required.acks", conf.acks);
+        prop.put("send.buffer.bytes",  conf.sendBufferSize);
         ProducerConfig pConfig = new ProducerConfig(prop);
         Producer<String, byte[]> heartPro = null;
         try {
