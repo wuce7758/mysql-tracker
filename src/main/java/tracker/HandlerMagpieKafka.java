@@ -522,26 +522,20 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         while (!entryQueue.isEmpty()) {
             CanalEntry.Entry entry = entryQueue.take();
             if(entry == null) continue;
-            if(isEndEntry(entry)) lastEntry = entry;
-            if(entry == lastEntry) {
-                binlog = eventConvert.getBinlogFileName();
-                globalBinlogName = binlog;
-                globalXidEntry = lastEntry;
-                globalXidBatchId = batchId;
-                globalXidInBatchId = inBatchId;
-            }
+            lastEntry = entry;//all entry can be last entry !!!!!
             if(fm.isMatch(entry.getHeader().getSchemaName()+"."+entry.getHeader().getTableName())) {
                 // re-pack the entry
-                CanalEntry.Entry.Builder builder = CanalEntry.Entry.newBuilder();
-                builder.setHeader(entry.getHeader());
-                builder.setEntryType(entry.getEntryType());
-                builder.setStoreValue(entry.getStoreValue());
-                builder.setBatchId(batchId);
-                builder.setInId(inBatchId);
-                builder.setIp(config.address);
-                entry = builder.build();
+                entry =
+                        CanalEntry.Entry.newBuilder()
+                                .setHeader(entry.getHeader())
+                                .setEntryType(entry.getEntryType())
+                                .setStoreValue(entry.getStoreValue())
+                                .setBatchId(batchId)
+                                .setInId(inBatchId)
+                                .setIp(config.address)
+                                .build();
                 inBatchId++;//batchId.inId almost point next event's position
-                if(isEndEntry(entry)) {
+                if(isEndEntry(entry)) {// instead of isEndEntry(entry)
                     inBatchId = 0;
                     batchId++;
                 }
@@ -551,6 +545,14 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 messageList.add(km);
             }
             if(messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) break;
+        }
+        //per minute record
+        if(lastEntry != null) {
+            binlog = lastEntry.getHeader().getLogfileName();
+            globalBinlogName = binlog;
+            globalXidEntry = lastEntry;
+            globalXidBatchId = batchId;
+            globalXidInBatchId = inBatchId;
         }
         // serialize the list -> filter -> batch for it -> send the batched bytes to the kafka; persistence the batched list???
         // or no batched list???
@@ -562,10 +564,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             if(messageList.size() == 0) return;
             monitor.persisNum = messageList.size();
             persisteKeyMsg(messageList);
-            confirmPos(lastEntry,binlog);//send the mysql pos batchid inbatchId to zk
+            confirmPos(lastEntry);//send the mysql pos batchid inbatchId to zk
             messageList.clear();
         }
         if(monitor.persisNum > 0) {
+            monitor.persistenceStart = startTime;
+            monitor.persistenceEnd = System.currentTimeMillis();
             logger.info("===================================> persistence thread:");
             logger.info("---> persistence deal during time:" + (monitor.persistenceEnd - monitor.persistenceStart) + " ms");
             logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
@@ -597,14 +601,40 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     }
 
     private void persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
-        monitor.persistenceStart = System.currentTimeMillis();
         msgSender.sendKeyMsg(msgs);
-        monitor.persistenceEnd = System.currentTimeMillis();
     }
 
     private void confirmPos(LogEvent last, String bin) throws Exception {
         if(last != null) {
             String pos = bin + ":" + last.getLogPos() + ":" + batchId + ":" + inBatchId;
+            try {
+                zkExecutor.set(config.persisPath, pos);
+            } catch (Exception e) { //retry
+                logger.error(e.getMessage());
+                boolean isconn = false;
+                int isZk = 0;
+                while (!isconn) {
+                    if(isZk >= config.retrys) {
+                        globalFetchThread = 1;
+                        return;
+                    }
+                    isZk++;
+                    try {
+                        zkExecutor.set(config.persisPath, pos);
+                        isconn = true;
+                    } catch (Exception e1) {
+                        logger.error("retrying...... Exception:" +e1.getMessage());
+                        delay(3);
+                    }
+                }
+            }
+        }
+    }
+
+    private void confirmPos(CanalEntry.Entry entry) throws Exception {
+        if(entry != null) {
+            String bin = entry.getHeader().getLogfileName();
+            String pos = bin + ":" + (entry.getHeader().getLogfileOffset() + entry.getHeader().getEventLength()) + ":" + batchId + ":" + inBatchId;
             try {
                 zkExecutor.set(config.persisPath, pos);
             } catch (Exception e) { //retry
