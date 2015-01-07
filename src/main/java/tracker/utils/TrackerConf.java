@@ -39,13 +39,15 @@ public class TrackerConf {
     public int queuesize = 50000;
     public int sumBatch = 5 * batchsize;
     public int timeInterval = 1;
+    public int reInterval = 3;
     public String filterRegex = ".*\\..*";
     public int minsec = 60;
-    public int heartsec = 5 * 60;
-    public int retrys = 100;//if we retry 100 connect or send failed too, we will reload the job
+    public int heartsec = 1 * 60;//10
+    public int retrys = 100;//if we retry 100 connect or send failed too, we will reload the job //interval time
     public double mbUnit = 1024.0 * 1024.0;
     public String jobId = "mysql-tracker";
     public int spacesize = 8;//8 MB
+    public int monitorsec = 60;//1 minute
 
 
     public void initConfLocal() {

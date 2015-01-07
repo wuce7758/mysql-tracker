@@ -13,6 +13,10 @@ public class TrackerMonitor {
 
     public long persistenceEnd;
 
+    public long sendStart;
+
+    public long sendEnd;
+
     public long perMinStart;
 
     public long perMinEnd;
@@ -43,12 +47,16 @@ public class TrackerMonitor {
 
     public long decodeEnd;
 
+    public long delayTime;
+
     public TrackerMonitor() {
         fetchStart = fetchEnd = persistenceStart = persistenceEnd = 0;
         perMinStart = perMinEnd = hbaseReadStart = hbaseReadEnd = 0;
         hbaseWriteStart = hbaseWriteEnd = serializeStart = serializeEnd = 0;
         fetchNum = persisNum = batchSize = 0;
         fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
+        sendStart = sendEnd = 0;
+        delayTime = 0;
     }
 
     public void clear() {
@@ -57,6 +65,8 @@ public class TrackerMonitor {
         hbaseWriteStart = hbaseWriteEnd = serializeStart = serializeEnd = 0;
         fetchNum = persisNum = batchSize = 0;
         fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
+        sendStart = sendEnd = 0;
+        delayTime = 0;
     }
 
 }

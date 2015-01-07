@@ -312,13 +312,28 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         private Logger logger = LoggerFactory.getLogger(Fetcher.class);
         private LogEvent event;
         private TrackerMonitor monitor = new TrackerMonitor();
+        private TrackerMonitor minuteMonitor = new TrackerMonitor();
+        public FetchMonitorMin timerMonitor = new FetchMonitorMin();
+        public Timer timer = new Timer();
 
         public boolean iskilled = false;
+
+        class FetchMonitorMin extends TimerTask {
+            private Logger logger = LoggerFactory.getLogger(FetchMonitorMin.class);
+
+            public void run() {
+                logger.info("==============> per minute fetch monitor:");
+                logger.info("---> fetch number of entry:" + minuteMonitor.fetchNum + " entries");
+                logger.info("---> fetch sum size :" + minuteMonitor.batchSize / config.mbUnit + " MB");
+                minuteMonitor.clear();
+            }
+        }
 
         public void run() {
             try {
                 init();
                 int counter = 0;
+                timer.schedule(timerMonitor, 1000, config.monitorsec * 1000);//start thread
                 while (fetcher.fetch()) {
                     if (counter == 0) monitor.fetchStart = System.currentTimeMillis();
                     event = decoder.decode(fetcher, context);
@@ -332,8 +347,10 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     //add the entry to the queue
                     entryQueue.put(entry);
                     counter++;
+                    minuteMonitor.fetchNum++;
                     monitor.batchSize += event.getEventLen();
-                    if(counter >= config.batchsize) {
+                    minuteMonitor.batchSize += event.getEventLen();
+                    if(counter >= config.batchsize) {//number / size | per minute
                         monitor.fetchEnd = System.currentTimeMillis();
                         logger.info("===================================> fetch thread : ");
                         logger.info("---> fetch during time : " + (monitor.fetchEnd - monitor.fetchStart) + " ms");
@@ -396,6 +413,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             fetcher.start(logConnector.getChannel());
             decoder = new LogDecoder(LogEvent.UNKNOWN_EVENT, LogEvent.ENUM_END_EVENT);
             context = new LogContext();
+        }
+
+        public void shutdown() {
+            timerMonitor.cancel();
+            timer.cancel();
         }
     }
 
@@ -563,6 +585,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         if((messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
             if(messageList.size() == 0) return;
             monitor.persisNum = messageList.size();
+            monitor.delayTime = (System.currentTimeMillis() - lastEntry.getHeader().getExecuteTime());
             persisteKeyMsg(messageList);
             confirmPos(lastEntry);//send the mysql pos batchid inbatchId to zk
             messageList.clear();
@@ -570,8 +593,10 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         if(monitor.persisNum > 0) {
             monitor.persistenceStart = startTime;
             monitor.persistenceEnd = System.currentTimeMillis();
-            logger.info("===================================> persistence thread:");
+            logger.info("===================================> persistence thread / monitor:");
             logger.info("---> persistence deal during time:" + (monitor.persistenceEnd - monitor.persistenceStart) + " ms");
+            logger.info("---> send time :" + (monitor.sendEnd - monitor.sendStart) + " ms");
+            logger.info("---> parser delay time:" + monitor.delayTime + " ms");
             logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
             logger.info("---> entry list to bytes sum size is " + monitor.batchSize / config.mbUnit + " MB");
             if(lastEntry != null)
@@ -599,9 +624,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         monitor.hbaseWriteEnd = System.currentTimeMillis();
 
     }
-
+    //number / size / yanshi / send kafka time(now - last event of list) | per minute
     private void persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
+        monitor.sendStart = System.currentTimeMillis();
         msgSender.sendKeyMsg(msgs);
+        monitor.sendEnd = System.currentTimeMillis();
     }
 
     private void confirmPos(LogEvent last, String bin) throws Exception {
@@ -718,6 +745,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
 
     public void close(String id) throws Exception {
         fetcher.iskilled = true;//stop the fetcher thread
+        fetcher.shutdown();//stop the fetcher's timer task
         minter.cancel();//stop the per minute record
         heartBeat.cancel();//stop the heart beat thread
         timer.cancel();

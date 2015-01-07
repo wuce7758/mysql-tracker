@@ -90,4 +90,9 @@ public class ZkExecutor {
         }
         return true;
     }
+
+    public void reconnect() throws Exception {
+        close();
+        connect();
+    }
 }
