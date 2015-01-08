@@ -6,7 +6,9 @@ import filter.FilterMatcher;
 import kafka.driver.producer.KafkaSender;
 import kafka.producer.KeyedMessage;
 import kafka.utils.KafkaConf;
+import monitor.JrdwMonitorVo;
 import monitor.TrackerMonitor;
+import monitor.constants.JDMysqlTrackerPhenix;
 import mysql.dbsync.DirectLogFetcherChannel;
 import mysql.dbsync.LogContext;
 import mysql.dbsync.LogDecoder;
@@ -23,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+import protocol.json.JSONConvert;
 import protocol.protobuf.CanalEntry;
 import tracker.common.TableMetaCache;
 import tracker.parser.LogEventConvert;
@@ -67,6 +70,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private String jobId;
     //kafka
     private KafkaSender msgSender;
+    //phoenix kafka
+    private KafkaSender phMonitorSender;
     //zk
     private ZkExecutor zkExecutor;
     //blocking queue
@@ -163,6 +168,14 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         kcnf.acks = config.acks;
         msgSender = new KafkaSender(kcnf);
         msgSender.connect();
+        //phoenix monitor kafka
+        KafkaConf kpcnf = new KafkaConf();
+        kpcnf.brokerList = config.phKaBrokerList;
+        kpcnf.port = config.phKaPort;
+        kpcnf.topic = config.phKaTopic;
+        kpcnf.acks = config.phKaAcks;
+        phMonitorSender = new KafkaSender(kpcnf);
+        phMonitorSender.connect();
         //zk
         ZkConf zcnf = new ZkConf();
         zcnf.zkServers = config.zkServers;
@@ -256,7 +269,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         logger.info("finding position......");
         EntryPosition returnPos = null;
         try {
-            String getStr = zkExecutor.get(config.persisPath);
+            String zkPos = config.persisPath + "/" + jobId;
+            String getStr = zkExecutor.get(zkPos);
             if(getStr == null || getStr.equals("")) {
                 logger.info("find mysql show master status......");
                 returnPos = findPosFromMysqlNow();
@@ -269,7 +283,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             }
             String[] ss = getStr.split(":");
             if(ss.length != 4) {
-                zkExecutor.delete(config.persisPath);
+                zkExecutor.delete(zkPos);
                 logger.error("zk position format is error...");
                 return null;
             }
@@ -322,10 +336,19 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             private Logger logger = LoggerFactory.getLogger(FetchMonitorMin.class);
 
             public void run() {
-                logger.info("==============> per minute fetch monitor:");
-                logger.info("---> fetch number of entry:" + minuteMonitor.fetchNum + " entries");
-                logger.info("---> fetch sum size :" + minuteMonitor.batchSize / config.mbUnit + " MB");
-                minuteMonitor.clear();
+                try {
+                    logger.info("==============> per minute fetch monitor:");
+                    logger.info("---> fetch number of entry:" + minuteMonitor.fetchNum + " entries");
+                    logger.info("---> fetch sum size :" + minuteMonitor.batchSize / config.mbUnit + " MB");
+                    //send monitor phenix
+                    JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitor(JDMysqlTrackerPhenix.FETCH_MONITOR, jobId);
+                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                    phMonitorSender.sendKeyMsg(km);
+                    minuteMonitor.clear();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -368,7 +391,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 String errMsg = e.getMessage();
                 if(errMsg.contains("errno = 1236")) {
                     try {
-                        zkExecutor.delete(config.persisPath);//invalid position
+                        String zkPos = config.persisPath + "/" + jobId;
+                        zkExecutor.delete(zkPos);//invalid position
                     } catch (Exception e1) {
                         logger.error(e1.getMessage());
                         e1.printStackTrace();
@@ -432,6 +456,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             DateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
             String time = sdf.format(cal.getTime());
             String date = sdfDate.format(cal.getTime());
+            String[] tt = time.split(":");
+            String hour = tt[0];
             String xidValue = null;
             long pos = -1;
             if(globalXidEntry != null) {
@@ -445,10 +471,16 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 if(!zkExecutor.exists(config.minutePath+"/"+date)) {
                     zkExecutor.create(config.minutePath+"/"+date,date);
                 }
-                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+time)) {
-                    zkExecutor.create(config.minutePath + "/" + date + "/" + time, xidValue);
-                } else  {
-                    zkExecutor.set(config.minutePath + "/" + date + "/" + time, xidValue);
+                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
+                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
+                }
+                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
+                    zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
+                }
+                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
+                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
+                } else {
+                    zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -463,13 +495,19 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     }
                     retryZk++;
                     try {
-                        if (!zkExecutor.exists(config.minutePath + "/" + date)) {
-                            zkExecutor.create(config.minutePath + "/" + date, date);
+                        if(!zkExecutor.exists(config.minutePath+"/"+date)) {
+                            zkExecutor.create(config.minutePath+"/"+date,date);
                         }
-                        if (!zkExecutor.exists(config.minutePath + "/" + date + "/" + time)) {
-                            zkExecutor.create(config.minutePath + "/" + date + "/" + time, xidValue);
+                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
+                            zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
+                        }
+                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
+                            zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
+                        }
+                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
+                            zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
                         } else {
-                            zkExecutor.set(config.minutePath + "/" + date + "/" + time, xidValue);
+                            zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
                         }
                         isconn = true;
                     } catch (Exception e1) {
@@ -505,6 +543,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             //check kafka sender
             if(!msgSender.isConnected()) {
                 logger.info("kafka producer connection loss, reload the job ......");
+                globalFetchThread = 1;
+                return;
+            }
+            //check phoenix kafka sender
+            if(!phMonitorSender.isConnected()) {
+                logger.info("phoenix kafka producer connection loss, reload the job ......");
                 globalFetchThread = 1;
                 return;
             }
@@ -603,6 +647,22 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 logger.info("---> position info:"+" binlog file is " + globalBinlogName +
                         ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
                         ",in batch id is :" + globalXidInBatchId);
+            //send phoenix monitor
+            final TrackerMonitor phMonitor = monitor;
+            Thread sendMonitor = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JrdwMonitorVo jmv = phMonitor.toJrdwMonitor(JDMysqlTrackerPhenix.PERSIS_MONITOR, jobId);
+                        String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                        KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                        phMonitorSender.sendKeyMsg(km);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            sendMonitor.start();
             monitor.clear();
             startTime = System.currentTimeMillis();
         }
@@ -635,7 +695,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         if(last != null) {
             String pos = bin + ":" + last.getLogPos() + ":" + batchId + ":" + inBatchId;
             try {
-                zkExecutor.set(config.persisPath, pos);
+                String zkPos = config.persisPath + "/" + jobId;
+                if(!zkExecutor.exists(zkPos)) {
+                    zkExecutor.create(zkPos, pos);
+                } else {
+                    zkExecutor.set(zkPos, pos);
+                }
             } catch (Exception e) { //retry
                 logger.error(e.getMessage());
                 boolean isconn = false;
@@ -647,7 +712,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     }
                     isZk++;
                     try {
-                        zkExecutor.set(config.persisPath, pos);
+                        String zkpos = config.persisPath + "/" + jobId;
+                        zkExecutor.set(zkpos, pos);
                         isconn = true;
                     } catch (Exception e1) {
                         logger.error("retrying...... Exception:" +e1.getMessage());
@@ -663,7 +729,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             String bin = entry.getHeader().getLogfileName();
             String pos = bin + ":" + (entry.getHeader().getLogfileOffset() + entry.getHeader().getEventLength()) + ":" + batchId + ":" + inBatchId;
             try {
-                zkExecutor.set(config.persisPath, pos);
+                String zkPos = config.persisPath + "/" + jobId;
+                if(!zkExecutor.exists(zkPos)) {
+                    zkExecutor.create(zkPos, pos);
+                } else {
+                    zkExecutor.set(zkPos, pos);
+                }
             } catch (Exception e) { //retry
                 logger.error(e.getMessage());
                 boolean isconn = false;
@@ -675,7 +746,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     }
                     isZk++;
                     try {
-                        zkExecutor.set(config.persisPath, pos);
+                        String zkpos = config.persisPath + "/" + jobId;
+                        zkExecutor.set(zkpos, pos);
                         isconn = true;
                     } catch (Exception e1) {
                         logger.error("retrying...... Exception:" +e1.getMessage());
@@ -690,7 +762,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         if(entry != null) {
             String pos = bin + ":" + (entry.getHeader().getLogfileOffset() + entry.getHeader().getEventLength()) + ":" + batchId + ":" + inBatchId;
             try {
-                zkExecutor.set(config.persisPath, pos);
+                String zkPos = config.persisPath + "/" + jobId;
+                if(!zkExecutor.exists(zkPos)) {
+                    zkExecutor.create(zkPos, pos);
+                } else {
+                    zkExecutor.set(zkPos, pos);
+                }
             } catch (Exception e) { //retry
                 logger.error(e.getMessage());
                 boolean isconn = false;
@@ -702,6 +779,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     }
                     isZk++;
                     try {
+                        String zkpos = config.persisPath + "/" + jobId;
                         zkExecutor.set(config.persisPath, pos);
                         isconn = true;
                     } catch (Exception e1) {

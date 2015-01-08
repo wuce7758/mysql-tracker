@@ -31,8 +31,8 @@ public class TrackerConf {
     //zk conf
     public String zkServers = "127.0.0.1:2181";//"48:2181,19:2181,50:2181"
     public int timeout = 100000;
-    public String rootPath = "/mysql_tracker";
-    public String persisPath = rootPath + "/persis";
+    public String rootPath = "/checkpoint";
+    public String persisPath = rootPath + "/persistence";
     public String minutePath = rootPath + "/minutes";
     //tracker conf
     public int batchsize = 10000;
@@ -48,6 +48,16 @@ public class TrackerConf {
     public String jobId = "mysql-tracker";
     public int spacesize = 8;//8 MB
     public int monitorsec = 60;//1 minute
+    //phenix monitor
+    public String phKaBrokerList = "localhost:9092";
+    public int phKaPort = 9092;
+    public String phKaZk = "localhost:2181";
+    public String phKaSeria = "kafka.serializer.DefaultEncoder";
+    public String phKaKeySeria = "kafka.serializer.StringEncoder";
+    public String phKaParti = "kafka.producer.DefaultPartitioner";
+    public String phKaAcks = "3";
+    public String phKaTopic = "test1";
+    public int phKaPartition = 0;
 
 
     public void initConfLocal() {

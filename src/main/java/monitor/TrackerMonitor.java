@@ -1,5 +1,12 @@
 package monitor;
 
+import monitor.constants.JDMysqlTrackerPhenix;
+import net.sf.json.JSONObject;
+import protocol.json.JSONConvert;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by hp on 14-9-23.
  */
@@ -68,5 +75,56 @@ public class TrackerMonitor {
         sendStart = sendEnd = 0;
         delayTime = 0;
     }
+
+    public JrdwMonitorVo toJrdwMonitor(int id) {
+        JrdwMonitorVo jmv = new JrdwMonitorVo();
+        jmv.setId(id);
+        //pack the member / value  to the Map<String,String> or Map<String,Long>
+        Map<String, Long> content = new HashMap<String, Long>();
+        switch (id) {
+            case JDMysqlTrackerPhenix.FETCH_MONITOR:
+                content.put(JDMysqlTrackerPhenix.FETCH_ROWS, fetchNum);
+                content.put(JDMysqlTrackerPhenix.FETCH_SIZE, batchSize);
+                break;
+            case JDMysqlTrackerPhenix.PERSIS_MONITOR:
+                content.put(JDMysqlTrackerPhenix.SEND_ROWS, persisNum);
+                content.put(JDMysqlTrackerPhenix.SEND_SIZE, batchSize);
+                content.put(JDMysqlTrackerPhenix.SEND_TIME, (sendEnd - sendStart));
+                content.put(JDMysqlTrackerPhenix.DELAY_TIME, delayTime);
+                break;
+            default:
+                break;
+        }
+        JSONObject jo = JSONConvert.MapToJson(content);
+        jmv.setContent(jo.toString());
+        return jmv;
+    }
+
+    public JrdwMonitorVo toJrdwMonitor(int id, String jobId) {
+        JrdwMonitorVo jmv = new JrdwMonitorVo();
+        jmv.setId(id);
+        jmv.setJrdw_mark(jobId);
+        //pack the member / value  to the Map<String,String> or Map<String,Long>
+        Map<String, Long> content = new HashMap<String, Long>();
+        switch (id) {
+            case JDMysqlTrackerPhenix.FETCH_MONITOR:
+                content.put(JDMysqlTrackerPhenix.FETCH_ROWS, fetchNum);
+                content.put(JDMysqlTrackerPhenix.FETCH_SIZE, batchSize);
+                break;
+            case JDMysqlTrackerPhenix.PERSIS_MONITOR:
+                content.put(JDMysqlTrackerPhenix.SEND_ROWS, persisNum);
+                content.put(JDMysqlTrackerPhenix.SEND_SIZE, batchSize);
+                content.put(JDMysqlTrackerPhenix.SEND_TIME, (sendEnd - sendStart));
+                content.put(JDMysqlTrackerPhenix.DELAY_TIME, delayTime);
+                break;
+            default:
+                break;
+        }
+        //map to json
+        JSONObject jo = JSONConvert.MapToJson(content);
+        jmv.setContent(jo.toString());
+        return jmv;
+    }
+
 
 }

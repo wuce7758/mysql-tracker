@@ -7,22 +7,21 @@ import kafka.utils.KafkaConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 /**
- * Created by hp on 14-12-12.
+ * Created by hp on 15-1-8.
  */
-public class KafkaSender {
+public class GenericKafkaSender<T1, T2> {
 
-    private Logger logger = LoggerFactory.getLogger(KafkaSender.class);
+    private Logger logger = LoggerFactory.getLogger(GenericKafkaSender.class);
 
     private KafkaConf conf;
-    private Producer<String, byte[]> producer;
+    private Producer<T1, T2> producer;
     private int retrys = 100;
 
-    public KafkaSender(KafkaConf cf) {
+    public GenericKafkaSender(KafkaConf cf) {
         conf = cf;
     }
 
@@ -34,45 +33,17 @@ public class KafkaSender {
         prop.put("partitioner.class", conf.partitioner);
         prop.put("request.required.acks", conf.acks);
         ProducerConfig pConfig = new ProducerConfig(prop);
-        producer = new Producer<String, byte[]>(pConfig);
+        producer = new Producer<T1, T2>(pConfig);
     }
 
-    public void send(byte[] msg) {
-        KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(conf.topic, null, msg);
-        blockSend(keyMsg);
-    }
-
-    public void send(String topic, byte[] msg) {
-        KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(topic, null, msg);
-        blockSend(keyMsg);
-    }
-
-    public void send(List<byte[]> msgs) {
-        List<KeyedMessage<String, byte[]>> keyMsgs = new ArrayList<KeyedMessage<String, byte[]>>();
-        for(byte[] msg : msgs) {
-            KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(conf.topic, null, msg);
-            keyMsgs.add(keyMsg);
-        }
+    public void sendKeyMsg(List<KeyedMessage<T1, T2>> keyMsgs) {
         blockSend(keyMsgs);
     }
-
-    public void send(String topic, List<byte[]> msgs) {
-        List<KeyedMessage<String, byte[]>> keyMsgs = new ArrayList<KeyedMessage<String, byte[]>>();
-        for(byte[] msg : msgs) {
-            KeyedMessage<String, byte[]> keyMsg = new KeyedMessage<String, byte[]>(topic, null, msg);
-            keyMsgs.add(keyMsg);
-        }
-        blockSend(keyMsgs);
-    }
-
-    public void sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs) {
-        blockSend(keyMsgs);
-    }
-    public void sendKeyMsg(KeyedMessage<String, byte[]> km) {
+    public void sendKeyMsg(KeyedMessage<T1, T2> km) {
         blockSend(km);
     }
 
-    public void blockSend(List<KeyedMessage<String, byte[]>> keyMsgs) {
+    public void blockSend(List<KeyedMessage<T1, T2>> keyMsgs) {
         boolean isAck = false;
         int retryKafka = 0;
         while (!isAck) {
@@ -92,7 +63,7 @@ public class KafkaSender {
         }
     }
 
-    public void blockSend(KeyedMessage<String, byte[]> keyMsg) {
+    public void blockSend(KeyedMessage<T1, T2> keyMsg) {
         boolean isAck = false;
         int retryKafka = 0;
         while (!isAck) {
@@ -147,4 +118,5 @@ public class KafkaSender {
         }
         return true;
     }
+
 }
