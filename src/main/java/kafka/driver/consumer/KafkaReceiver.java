@@ -46,6 +46,7 @@ public class KafkaReceiver extends Thread {
     private Logger logger = LoggerFactory.getLogger(KafkaReceiver.class);
     private KafkaConf conf;
     private List<String> replicaBrokers = new ArrayList<String>();
+    private List<Integer> replicaPorts = new ArrayList<Integer>();
     public static int retry = 3;
     private int MAXLEN = 10000;
     private SimpleConsumer consumer;
@@ -90,6 +91,36 @@ public class KafkaReceiver extends Thread {
         return returnData;
     }
 
+    //two List length must be equal
+    public PartitionMetadata findLeader(List<String> brokers, List<Integer> ports, String topic, int partition) {
+        PartitionMetadata returnData = null;
+        loop:
+        for (int i = 0; i <= brokers.size() - 1; i++) {
+            SimpleConsumer consumer = new SimpleConsumer(brokers.get(i), ports.get(i), 100000, 64 * 1024, "leader");
+            List<String> topics = Collections.singletonList(topic);
+            TopicMetadataRequest req = new TopicMetadataRequest(topics);
+            TopicMetadataResponse rep = consumer.send(req);
+            List<TopicMetadata> topicMetadatas = rep.topicsMetadata();
+            for (TopicMetadata topicMetadata : topicMetadatas) {
+                for (PartitionMetadata part : topicMetadata.partitionsMetadata()) {
+                    if(part.partitionId() == partition) {
+                        returnData = part;
+                        break loop;
+                    }
+                }
+            }
+        }
+        if(returnData != null) {
+            replicaBrokers.clear();
+            replicaPorts.clear();
+            for (Broker broker : returnData.replicas()) {
+                replicaBrokers.add(broker.host());
+                replicaPorts.add(broker.port());
+            }
+        }
+        return returnData;
+    }
+
     public long getLastOffset(SimpleConsumer consumer, String topic, int partition, long whitchTime, String clientName) {
         TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
         Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
@@ -125,8 +156,29 @@ public class KafkaReceiver extends Thread {
         throw new Exception("Unable to find new leader after Broker failure. Exiting");
     }
 
+    public String findNewLeader(String oldLeader, String topic, int partition) throws Exception {
+        for(int i = 0; i < retry; i++) {
+            boolean goToSleep = false;
+            PartitionMetadata metadata = findLeader(replicaBrokers, replicaPorts, topic, partition);
+            if(metadata == null) {
+                goToSleep = true;
+            } else if (metadata.leader() == null) {
+                goToSleep = true;
+            } else if(oldLeader.equalsIgnoreCase(metadata.leader().host()) && i == 0) {
+                goToSleep = true;
+            } else {
+                return metadata.leader().host();
+            }
+            if(goToSleep) {
+                delay(1);
+            }
+        }
+        logger.error("Unable to find new leader after Broker failure. Exiting");
+        throw new Exception("Unable to find new leader after Broker failure. Exiting");
+    }
+
     public void run() {
-        PartitionMetadata metadata = findLeader(conf.brokerSeeds, conf.port, conf.topic, conf.partition);
+        PartitionMetadata metadata = findLeader(conf.brokerSeeds, conf.portList, conf.topic, conf.partition);
         if(metadata == null) {
             logger.error("Can't find metadata for Topic and Partition. Existing");
             return;
@@ -136,13 +188,14 @@ public class KafkaReceiver extends Thread {
             return;
         }
         String leadBroker = metadata.leader().host();
+        int leadPort = metadata.leader().port();
         String clientName = "client_" + conf.topic + conf.partition;
-        consumer = new SimpleConsumer(leadBroker, conf.port, 100000, 64 * 1024, clientName);
+        consumer = new SimpleConsumer(leadBroker, leadPort, 100000, 64 * 1024, clientName);
         long readOffset = getLastOffset(consumer, conf.topic, conf.partition, kafka.api.OffsetRequest.LatestTime(), clientName);
         int numErr = 0;
         while (isFetch) {
             if(consumer == null) {
-                consumer = new SimpleConsumer(leadBroker, conf.port, 100000, 64 * 1024, clientName);
+                consumer = new SimpleConsumer(leadBroker, leadPort, 100000, 64 * 1024, clientName);
             }
             FetchRequest req = new FetchRequestBuilder()
                     .clientId(clientName)
@@ -164,7 +217,7 @@ public class KafkaReceiver extends Thread {
                 consumer.close();
                 consumer = null;
                 try {
-                    leadBroker = findNewLeader(leadBroker, conf.topic, conf.partition, conf.port);
+                    leadBroker = findNewLeader(leadBroker, conf.topic, conf.partition);
                 } catch (Exception e) {
                     logger.error("find lead broker failed");
                     e.printStackTrace();
@@ -211,16 +264,17 @@ public class KafkaReceiver extends Thread {
     public boolean isConnected() {
         SimpleConsumer hconsumer = null;
         try {
-            for (String broker : conf.brokerSeeds) {
-                hconsumer = new SimpleConsumer(broker, conf.port, 100000, 64 * 1024, "heartBeat");
+            for (int i = 0; i <= conf.brokerSeeds.size() - 1; i++) {
+                hconsumer = new SimpleConsumer(conf.brokerSeeds.get(i), conf.portList.get(i), 100000, 64 * 1024, "heartBeat");
                 List<String> topics = Collections.singletonList(conf.topic);
                 TopicMetadataRequest req = new TopicMetadataRequest(topics);
                 TopicMetadataResponse rep = hconsumer.send(req);
             }
-            if(hconsumer != null) hconsumer.close();
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            if(hconsumer != null) hconsumer.close();
         }
         return true;
     }

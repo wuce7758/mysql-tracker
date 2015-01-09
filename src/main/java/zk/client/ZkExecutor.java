@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import zk.utils.ZkConf;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by hp on 14-12-12.
@@ -61,6 +62,14 @@ public class ZkExecutor {
             }
         },null);
         return new String(bytes);
+    }
+
+    public List<String> getChildren(String path) throws Exception {
+        if(!exists(path)) {
+            return null;
+        }
+        List<String> childList = zk.getChildren(path, false);
+        return childList;
     }
 
     public void delete(String path) throws Exception {

@@ -1,5 +1,6 @@
 package tracker.utils;
 
+import kafka.utils.KafkaConf;
 import net.sf.json.JSONObject;
 import protocol.json.ConfigJson;
 
@@ -23,7 +24,7 @@ public class TrackerConf {
     public static String serializer = "kafka.serializer.DefaultEncoder";//default is byte[]
     public static String keySerializer = "kafka.serializer.StringEncoder";
     public static String partitioner = "kafka.producer.DefaultPartitioner";
-    public static String acks = "3";
+    public static String acks = "-1";
     public static String topic = "test";//queue topic
     public static int partition = 0;
     public static String strSeeds = "127.0.0.1";//"172.17.36.53,172.17.36.54,172.17.36.55";
@@ -55,7 +56,7 @@ public class TrackerConf {
     public String phKaSeria = "kafka.serializer.DefaultEncoder";
     public String phKaKeySeria = "kafka.serializer.StringEncoder";
     public String phKaParti = "kafka.producer.DefaultPartitioner";
-    public String phKaAcks = "3";
+    public String phKaAcks = "1";
     public String phKaTopic = "test1";
     public int phKaPartition = 0;
 
@@ -99,6 +100,46 @@ public class TrackerConf {
             strSeeds = data.getString("strSeeds");
             zkServers = data.getString("zkServers");
             filterRegex = data.getString("filterRegex");
+        }
+    }
+
+    public void initConfOnlineJSON() throws Exception {
+        clear();
+        ConfigJson jcnf = new ConfigJson("", "online.address");
+        JSONObject root = jcnf.getJson();
+        //parse the json
+        if(root != null) {
+            int _code = root.getInt("_code");
+            if(_code != 0) {
+                String errMsg = root.getString("errorMessage");
+                throw new Exception(errMsg);
+            }
+            JSONObject data = root.getJSONObject("data");
+            //mysql simple load
+            username = data.getString("source_user");
+            password = data.getString("source_password");
+            address = data.getString("source_host");
+            myPort = Integer.valueOf(data.getString("source_port"));
+            slaveId = Long.valueOf(data.getString("slaveId"));
+            //get kafka parameter from zk
+            String dataKafkaZk = data.getString("kafka_zkserver") + data.getString("kafka_zkroot");
+            KafkaConf dataCnf = new KafkaConf();
+            dataCnf.loadZk(dataKafkaZk);
+            brokerList = dataCnf.brokerList;
+            //kafka simple load json
+            acks = data.getString("kafka_acks");
+            topic = data.getString("tracker_log_topic");
+            //load own zk
+            zkServers = data.getString("offset_zkserver");
+            //get kafka monitor parameter from zk
+            String monitorKafkaZk = data.getString("monitor_server") + data.getString("monitor_zkroot");
+            KafkaConf monitorCnf = new KafkaConf();
+            monitorCnf.loadZk(monitorKafkaZk);
+            phKaBrokerList = monitorCnf.brokerList;
+            //kafka simple loadjson
+            phKaTopic = data.getString("monitor_topic");
+            //jobId
+            jobId = data.getString("job_id");
         }
     }
 

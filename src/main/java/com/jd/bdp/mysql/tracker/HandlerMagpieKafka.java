@@ -123,7 +123,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //id
         config.jobId = jobId;
         //init envrionment config (local,off-line,on-line)
-        config.initConfJSON();//config.initConfStatic();
+        config.initConfOnlineJSON();//config.initConfJSON();//config.initConfStatic();
+        //jobId
+        jobId = config.jobId;
         //generate the driver, interface etc.
         logConnector = new MysqlConnector(new InetSocketAddress(config.address, config.myPort),
                 config.username,
