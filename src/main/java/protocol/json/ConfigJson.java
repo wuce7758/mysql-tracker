@@ -5,13 +5,15 @@ import net.sf.json.JSONObject;
 import net.sf.json.util.JSONTokener;
 import org.ho.yaml.Yaml;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 
 /**
- * Created by hp on 14-11-12.
+ * Created by hp on 14-11-13.
  */
 public class ConfigJson {
 
@@ -34,7 +36,7 @@ public class ConfigJson {
         //get the urlStr
         try {
             HashMap ml = Yaml.loadType(this.getClass().getClassLoader().getResource(loadFile).openStream(), HashMap.class);
-            urlStr = ml.get("magpie.address") + jobId;
+            urlStr = ml.get(key) + jobId;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

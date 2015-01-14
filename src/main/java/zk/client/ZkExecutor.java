@@ -52,7 +52,7 @@ public class ZkExecutor {
     }
 
     public String get(String path) throws Exception {
-        if(! exists(path)) {
+        if(!exists(path)) {
             return null;//not exists return null
         }
         byte[] bytes = zk.getData(path, new Watcher() {

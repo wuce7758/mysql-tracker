@@ -4,6 +4,7 @@ import kafka.utils.KafkaConf;
 import net.sf.json.JSONObject;
 import protocol.json.ConfigJson;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,8 @@ public class TrackerConf {
     public String phKaAcks = "1";
     public String phKaTopic = "test1";
     public int phKaPartition = 0;
+    //charset mysql tracker
+    public Charset charset = Charset.forName("UTF-8");
 
 
     public void initConfLocal() {
@@ -121,6 +124,7 @@ public class TrackerConf {
             address = data.getString("source_host");
             myPort = Integer.valueOf(data.getString("source_port"));
             slaveId = Long.valueOf(data.getString("slaveId"));
+            charset = Charset.forName(data.getString("source_charset"));
             //get kafka parameter from zk
             String dataKafkaZk = data.getString("kafka_zkserver") + data.getString("kafka_zkroot");
             KafkaConf dataCnf = new KafkaConf();

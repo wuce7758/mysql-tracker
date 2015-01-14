@@ -41,13 +41,11 @@ public class KafkaConf {
                 zkPath += ("/" + ss[i]);
             }
         }
-        if(ss.length == 1) {
-            zkPath = "/";
-        }
         zkPath += ("/brokers/ids");
         ZkConf zcnf = new ZkConf();
         zcnf.zkServers = zkServer;
         ZkExecutor zkexe = new ZkExecutor(zcnf);
+        zkexe.connect();
         List<String> ids = zkexe.getChildren(zkPath);
         brokerList = "";
         brokerSeeds.clear();
@@ -60,8 +58,10 @@ public class KafkaConf {
             int port = jo.getInt("port");
             brokerSeeds.add(host);
             portList.add(port);
-            brokerList += (host + ":" + port);
+            brokerList += (host + ":" + port + ",");
         }
+        brokerList = brokerList.substring(0, brokerList.lastIndexOf(","));
+        zkexe.close();
     }
 
 }

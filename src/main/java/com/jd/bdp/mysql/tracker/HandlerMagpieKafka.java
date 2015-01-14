@@ -205,6 +205,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //event convert
         eventConvert = new LogEventConvert();
         eventConvert.setTableMetaCache(tableMetaCache);
+        eventConvert.setCharset(config.charset);
         //start time configuration
         startTime = System.currentTimeMillis();
         //global fetch thread
