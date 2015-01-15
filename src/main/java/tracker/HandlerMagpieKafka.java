@@ -8,7 +8,7 @@ import kafka.producer.KeyedMessage;
 import kafka.utils.KafkaConf;
 import monitor.JrdwMonitorVo;
 import monitor.TrackerMonitor;
-import monitor.constants.JDMysqlTrackerPhenix;
+import com.jd.bdp.monitors.constants.JDMysqlTrackerMonitorType;
 import mysql.dbsync.DirectLogFetcherChannel;
 import mysql.dbsync.LogContext;
 import mysql.dbsync.LogDecoder;
@@ -126,6 +126,14 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         config.initConfOnlineJSON();//config.initConfJSON();//config.initConfStatic();
         //jobId
         jobId = config.jobId;
+        //phoenix monitor kafka
+        KafkaConf kpcnf = new KafkaConf();
+        kpcnf.brokerList = config.phKaBrokerList;
+        kpcnf.port = config.phKaPort;
+        kpcnf.topic = config.phKaTopic;
+        kpcnf.acks = config.phKaAcks;
+        phMonitorSender = new KafkaSender(kpcnf);
+        phMonitorSender.connect();
         //generate the driver, interface etc.
         logConnector = new MysqlConnector(new InetSocketAddress(config.address, config.myPort),
                 config.username,
@@ -150,6 +158,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 realConnector.connect();
                 mysqlExists = true;
             } catch (IOException e) {
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
                 logger.error("connect mysql failed ... retry to connect it...");
                 e.printStackTrace();
                 delay(5);
@@ -170,14 +196,6 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         kcnf.acks = config.acks;
         msgSender = new KafkaSender(kcnf);
         msgSender.connect();
-        //phoenix monitor kafka
-        KafkaConf kpcnf = new KafkaConf();
-        kpcnf.brokerList = config.phKaBrokerList;
-        kpcnf.port = config.phKaPort;
-        kpcnf.topic = config.phKaTopic;
-        kpcnf.acks = config.phKaAcks;
-        phMonitorSender = new KafkaSender(kpcnf);
-        phMonitorSender.connect();
         //zk
         ZkConf zcnf = new ZkConf();
         zcnf.zkServers = config.zkServers;
@@ -194,6 +212,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 zkExecutor.connect();
                 isZk = true;
             } catch (Exception e) {
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
                 logger.error("connect zk failed , retrying......");
                 e.printStackTrace();
                 delay(3);
@@ -247,6 +283,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 }
                 isZk = true;
             } catch (Exception e) {
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
                 logger.error("retrying...... Exception:" + e.getMessage());
                 delay(3);
             }
@@ -344,7 +398,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     logger.info("---> fetch number of entry:" + minuteMonitor.fetchNum + " entries");
                     logger.info("---> fetch sum size :" + minuteMonitor.batchSize / config.mbUnit + " MB");
                     //send monitor phenix
-                    JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitor(JDMysqlTrackerPhenix.FETCH_MONITOR, jobId);
+                    JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.FETCH_MONITOR, jobId);
                     String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
                     KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                     phMonitorSender.sendKeyMsg(km);
@@ -389,6 +443,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 }
             } catch (Exception e) {
                 if(iskilled) return;
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
                 logger.error("fetch thread error : " + e.getMessage());
                 e.printStackTrace();
                 String errMsg = e.getMessage();
@@ -486,6 +558,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
                 }
             } catch (Exception e) {
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
                 e.printStackTrace();
                 logger.error("minute time err: " + e.getMessage());
                 logger.error(e.getMessage());
@@ -514,6 +604,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         }
                         isconn = true;
                     } catch (Exception e1) {
+                        //send monitor
+                        final String exmsg1 = e1.getMessage();
+                        Thread sendMonitor1 = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    TrackerMonitor exMonitor = new TrackerMonitor();
+                                    exMonitor.exMsg = exmsg1;
+                                    JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                                    phMonitorSender.sendKeyMsg(km);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        sendMonitor1.start();
                         logger.error("retrying...... Exception:" +e1.getMessage());
                         delay(3);
                     }
@@ -656,7 +764,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 @Override
                 public void run() {
                     try {
-                        JrdwMonitorVo jmv = phMonitor.toJrdwMonitor(JDMysqlTrackerPhenix.PERSIS_MONITOR, jobId);
+                        JrdwMonitorVo jmv = phMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.PERSIS_MONITOR, jobId);
                         String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
                         KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                         phMonitorSender.sendKeyMsg(km);
@@ -690,7 +798,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     //number / size / yanshi / send kafka time(now - last event of list) | per minute
     private void persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
         monitor.sendStart = System.currentTimeMillis();
-        msgSender.sendKeyMsg(msgs);
+        msgSender.sendKeyMsg(msgs, phMonitorSender, config);
         monitor.sendEnd = System.currentTimeMillis();
     }
 
@@ -705,6 +813,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     zkExecutor.set(zkPos, pos);
                 }
             } catch (Exception e) { //retry
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
                 logger.error(e.getMessage());
                 boolean isconn = false;
                 int isZk = 0;
@@ -719,6 +845,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         zkExecutor.set(zkpos, pos);
                         isconn = true;
                     } catch (Exception e1) {
+                        //send monitor
+                        final String exmsg1 = e1.getMessage();
+                        Thread sendMonitor1 = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    TrackerMonitor exMonitor = new TrackerMonitor();
+                                    exMonitor.exMsg = exmsg1;
+                                    JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                                    phMonitorSender.sendKeyMsg(km);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        sendMonitor1.start();
                         logger.error("retrying...... Exception:" +e1.getMessage());
                         delay(3);
                     }
@@ -739,6 +883,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     zkExecutor.set(zkPos, pos);
                 }
             } catch (Exception e) { //retry
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
                 logger.error(e.getMessage());
                 boolean isconn = false;
                 int isZk = 0;
@@ -753,6 +915,24 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         zkExecutor.set(zkpos, pos);
                         isconn = true;
                     } catch (Exception e1) {
+                        //send monitor
+                        final String exmsg1 = e1.getMessage();
+                        Thread sendMonitor1 = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    TrackerMonitor exMonitor = new TrackerMonitor();
+                                    exMonitor.exMsg = exmsg1;
+                                    JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                                    phMonitorSender.sendKeyMsg(km);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        sendMonitor1.start();
                         logger.error("retrying...... Exception:" +e1.getMessage());
                         delay(3);
                     }

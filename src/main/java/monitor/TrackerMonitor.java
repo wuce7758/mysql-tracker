@@ -1,5 +1,6 @@
 package monitor;
 
+import monitor.constants.JDMysqlTrackerMonitorType;
 import monitor.constants.JDMysqlTrackerPhenix;
 import net.sf.json.JSONObject;
 import protocol.json.JSONConvert;
@@ -56,6 +57,8 @@ public class TrackerMonitor {
 
     public long delayTime;
 
+    public String exMsg;
+
     public TrackerMonitor() {
         fetchStart = fetchEnd = persistenceStart = persistenceEnd = 0;
         perMinStart = perMinEnd = hbaseReadStart = hbaseReadEnd = 0;
@@ -64,6 +67,7 @@ public class TrackerMonitor {
         fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
         sendStart = sendEnd = 0;
         delayTime = 0;
+        exMsg = "";
     }
 
     public void clear() {
@@ -74,6 +78,7 @@ public class TrackerMonitor {
         fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
         sendStart = sendEnd = 0;
         delayTime = 0;
+        exMsg = "";
     }
 
     public JrdwMonitorVo toJrdwMonitor(int id) {
@@ -122,6 +127,40 @@ public class TrackerMonitor {
         }
         //map to json
         JSONObject jo = JSONConvert.MapToJson(content);
+        jmv.setContent(jo.toString());
+        return jmv;
+    }
+
+    public JrdwMonitorVo toJrdwMonitorOnline(int id, String jobId) {
+        JrdwMonitorVo jmv = new JrdwMonitorVo();
+        jmv.setId(id);
+        jmv.setJrdw_mark(jobId);
+        //pack the member / value  to the Map<String,String> or Map<String,Long>
+        Map<String, Long> content = new HashMap<String, Long>();
+        Map<String, String> msgContent = new HashMap<String, String>();
+        JSONObject jo;
+        switch (id) {
+            case JDMysqlTrackerMonitorType.FETCH_MONITOR:
+                content.put(JDMysqlTrackerMonitorType.FETCH_ROWS, fetchNum);
+                content.put(JDMysqlTrackerMonitorType.FETCH_SIZE, batchSize);
+                jo = JSONConvert.MapToJson(content);
+                break;
+            case JDMysqlTrackerMonitorType.PERSIS_MONITOR:
+                content.put(JDMysqlTrackerPhenix.SEND_ROWS, persisNum);
+                content.put(JDMysqlTrackerPhenix.SEND_SIZE, batchSize);
+                content.put(JDMysqlTrackerPhenix.SEND_TIME, (sendEnd - sendStart));
+                content.put(JDMysqlTrackerPhenix.DELAY_TIME, delayTime);
+                jo = JSONConvert.MapToJson(content);
+                break;
+            case JDMysqlTrackerMonitorType.EXCEPTION_MONITOR:
+                msgContent.put(JDMysqlTrackerMonitorType.EXCEPTION, exMsg);
+                jo = JSONConvert.MapToJson(msgContent);
+                break;
+            default:
+                jo = new JSONObject();
+                break;
+        }
+        //map to json
         jmv.setContent(jo.toString());
         return jmv;
     }

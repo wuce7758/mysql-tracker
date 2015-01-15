@@ -4,8 +4,13 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import kafka.utils.KafkaConf;
+import monitor.JrdwMonitorVo;
+import monitor.TrackerMonitor;
+import monitor.constants.JDMysqlTrackerMonitorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import protocol.json.JSONConvert;
+import tracker.utils.TrackerConf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +73,17 @@ public class KafkaSender {
     public void sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs) {
         blockSend(keyMsgs);
     }
+
+    public void sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs, KafkaSender sender, TrackerConf config) {
+        blockSend(keyMsgs, sender, config);
+    }
+
     public void sendKeyMsg(KeyedMessage<String, byte[]> km) {
         blockSend(km);
+    }
+
+    public void sendKeyMsg(KeyedMessage<String, byte[]> km, KafkaSender sender, TrackerConf config) {
+        blockSend(km, sender, config);
     }
 
     public void blockSend(List<KeyedMessage<String, byte[]>> keyMsgs) {
@@ -92,6 +106,37 @@ public class KafkaSender {
         }
     }
 
+    public void blockSend(List<KeyedMessage<String, byte[]>> keyMsgs, KafkaSender sender, TrackerConf config) {
+        boolean isAck = false;
+        int retryKafka = 0;
+        while (!isAck) {
+            if(retryKafka >= retrys) {
+                reconnect();
+                logger.warn("retry times out, reconnect the kafka server......");
+                retryKafka = 0;
+            }
+            retryKafka++;
+            try {
+                producer.send(keyMsgs);
+                isAck = true;
+            } catch (Exception e) {
+                //send monitor
+                try {
+                    TrackerMonitor monitor = new TrackerMonitor();
+                    monitor.exMsg = e.getMessage();
+                    JrdwMonitorVo jmv = monitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, config.jobId);
+                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                    sender.sendKeyMsg(km);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                logger.warn("retrying sending... Exception:" + e.getMessage());
+                delay(3);
+            }
+        }
+    }
+
     public void blockSend(KeyedMessage<String, byte[]> keyMsg) {
         boolean isAck = false;
         int retryKafka = 0;
@@ -106,6 +151,37 @@ public class KafkaSender {
                 producer.send(keyMsg);
                 isAck = true;
             } catch (Exception e) {
+                logger.warn("retrying sending... Exception:" + e.getMessage());
+                delay(3);
+            }
+        }
+    }
+
+    public void blockSend(KeyedMessage<String, byte[]> keyMsg, KafkaSender sender, TrackerConf config) {
+        boolean isAck = false;
+        int retryKafka = 0;
+        while (!isAck) {
+            if(retryKafka >= retrys) {
+                reconnect();
+                logger.warn("retry times out, reconnect the kafka server......");
+                retryKafka = 0;
+            }
+            retryKafka++;
+            try {
+                producer.send(keyMsg);
+                isAck = true;
+            } catch (Exception e) {
+                //send monitor
+                try {
+                    TrackerMonitor monitor = new TrackerMonitor();
+                    monitor.exMsg = e.getMessage();
+                    JrdwMonitorVo jmv = monitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, config.jobId);
+                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                    sender.sendKeyMsg(km);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
                 logger.warn("retrying sending... Exception:" + e.getMessage());
                 delay(3);
             }

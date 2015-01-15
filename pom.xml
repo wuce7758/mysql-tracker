@@ -221,6 +221,13 @@
             <artifactId>avro</artifactId>
             <version>1.7.4</version>
         </dependency>
+
+        <!-- phoenix -->
+        <dependency>
+            <groupId>com.jd.bdp</groupId>
+            <artifactId>magpie-monitor-constants</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 

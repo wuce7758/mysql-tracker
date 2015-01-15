@@ -108,7 +108,7 @@ public class TrackerConf {
 
     public void initConfOnlineJSON() throws Exception {
         clear();
-        ConfigJson jcnf = new ConfigJson("", "online.address");
+        ConfigJson jcnf = new ConfigJson(jobId, "offline.address");
         JSONObject root = jcnf.getJson();
         //parse the json
         if(root != null) {
