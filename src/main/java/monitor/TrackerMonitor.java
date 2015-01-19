@@ -59,6 +59,8 @@ public class TrackerMonitor {
 
     public String exMsg;
 
+    public String ip;
+
     public TrackerMonitor() {
         fetchStart = fetchEnd = persistenceStart = persistenceEnd = 0;
         perMinStart = perMinEnd = hbaseReadStart = hbaseReadEnd = 0;
@@ -67,7 +69,7 @@ public class TrackerMonitor {
         fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
         sendStart = sendEnd = 0;
         delayTime = 0;
-        exMsg = "";
+        exMsg = ip = "";
     }
 
     public void clear() {
@@ -78,7 +80,7 @@ public class TrackerMonitor {
         fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
         sendStart = sendEnd = 0;
         delayTime = 0;
-        exMsg = "";
+        exMsg = ip = "";
     }
 
     public JrdwMonitorVo toJrdwMonitor(int id) {
@@ -138,6 +140,7 @@ public class TrackerMonitor {
         //pack the member / value  to the Map<String,String> or Map<String,Long>
         Map<String, Long> content = new HashMap<String, Long>();
         Map<String, String> msgContent = new HashMap<String, String>();
+        Map<String, String> IPContent = new HashMap<String, String>();
         JSONObject jo;
         switch (id) {
             case JDMysqlTrackerMonitorType.FETCH_MONITOR:
@@ -155,6 +158,10 @@ public class TrackerMonitor {
             case JDMysqlTrackerMonitorType.EXCEPTION_MONITOR:
                 msgContent.put(JDMysqlTrackerMonitorType.EXCEPTION, exMsg);
                 jo = JSONConvert.MapToJson(msgContent);
+                break;
+            case JDMysqlTrackerMonitorType.IP_MONITOR:
+                IPContent.put(JDMysqlTrackerMonitorType.IP, ip);
+                jo = JSONConvert.MapToJson(IPContent);
                 break;
             default:
                 jo = new JSONObject();

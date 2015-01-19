@@ -35,6 +35,7 @@ import zk.client.ZkExecutor;
 import zk.utils.ZkConf;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
@@ -111,6 +112,14 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private void delay(int sec) {
         try {
             Thread.sleep(sec * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private  void delayMin(int msec) {
+        try {
+            Thread.sleep(msec);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -242,6 +251,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         eventConvert = new LogEventConvert();
         eventConvert.setTableMetaCache(tableMetaCache);
         eventConvert.setCharset(config.charset);
+        eventConvert.filterMap.putAll(config.filterMap);
         //start time configuration
         startTime = System.currentTimeMillis();
         //global fetch thread
@@ -371,6 +381,25 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         fetcher.start();
         timer.schedule(minter, 1000, config.minsec * 1000);
         htimer.schedule(heartBeat, 1000, config.heartsec * 1000);
+        //ip monitor
+        //send monitor
+        final String localIp = InetAddress.getLocalHost().getHostAddress();
+        Thread sendMonitor = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    TrackerMonitor ipMonitor = new TrackerMonitor();
+                    ipMonitor.ip = localIp;
+                    JrdwMonitorVo jmv = ipMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.IP_MONITOR, jobId);
+                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                    phMonitorSender.sendKeyMsg(km);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        sendMonitor.start();
         //log
         logger.info("start the tracker successfully......");
         delay(3);//waiting threads start
@@ -687,6 +716,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     }
 
     public void run() throws Exception {
+        //cpu 100%
+        if(entryQueue.isEmpty()) {
+            delayMin(100);
+        }
+
         //check fetch thread status
         if(globalFetchThread == 1) {
             globalFetchThread = 0;
@@ -700,7 +734,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             CanalEntry.Entry entry = entryQueue.take();
             if(entry == null) continue;
             lastEntry = entry;//all entry can be last entry !!!!!
-            if(fm.isMatch(entry.getHeader().getSchemaName()+"."+entry.getHeader().getTableName())) {
+            if(isInMap(entry.getHeader().getSchemaName() + "." + entry.getHeader().getTableName())) {
                 // re-pack the entry
                 entry =
                         CanalEntry.Entry.newBuilder()
@@ -777,6 +811,10 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             monitor.clear();
             startTime = System.currentTimeMillis();
         }
+    }
+
+    private boolean isInMap(String key) {
+        return config.filterMap.containsKey(key);
     }
 
     private void persisteData(List<CanalEntry.Entry> entries) {

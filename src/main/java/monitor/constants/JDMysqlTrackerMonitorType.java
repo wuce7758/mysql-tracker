@@ -9,6 +9,7 @@ public class JDMysqlTrackerMonitorType {
     public static final int FETCH_MONITOR = 20001;
     public static final int PERSIS_MONITOR = 20002;
     public static final int EXCEPTION_MONITOR = 20003;
+    public static final int IP_MONITOR = 20004;
     public static final int JD_MYSQL_TRACKER_MONITOR_TYPE_MAX = 20999;
 
     // fetch
@@ -23,5 +24,8 @@ public class JDMysqlTrackerMonitorType {
 
     //exception
     public static final String EXCEPTION = "EXCEPTION";
+
+    //ip
+    public static final String IP = "IP";
 
 }

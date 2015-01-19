@@ -1,12 +1,15 @@
 package tracker.utils;
 
 import kafka.utils.KafkaConf;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import protocol.json.ConfigJson;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 14-12-12.
@@ -62,6 +65,8 @@ public class TrackerConf {
     public int phKaPartition = 0;
     //charset mysql tracker
     public Charset charset = Charset.forName("UTF-8");
+    //filter same to parser
+    public static Map<String, String> filterMap = new HashMap<String, String>();
 
 
     public void initConfLocal() {
@@ -108,7 +113,7 @@ public class TrackerConf {
 
     public void initConfOnlineJSON() throws Exception {
         clear();
-        ConfigJson jcnf = new ConfigJson(jobId, "offline.address");
+        ConfigJson jcnf = new ConfigJson(jobId, "online.address");
         JSONObject root = jcnf.getJson();
         //parse the json
         if(root != null) {
@@ -144,11 +149,22 @@ public class TrackerConf {
             phKaTopic = data.getString("monitor_topic");
             //jobId
             jobId = data.getString("job_id");
+            //filter load
+            JSONArray jf = data.getJSONArray("db_tab_meta");
+            for(int i = 0; i <= jf.size() - 1; i++) {
+                JSONObject jdata = jf.getJSONObject(i);
+                String dbname = jdata.getString("dbname");
+                String tbname = jdata.getString("tablename");
+                String key = dbname + "." + tbname;
+                String value = tbname;
+                filterMap.put(key, value);
+            }
         }
     }
 
     //clear the conf info
     public void clear() {
         brokerSeeds.clear();
+        filterMap.clear();
     }
 }

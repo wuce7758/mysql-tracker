@@ -36,7 +36,9 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.sql.Types;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 14-9-3.
@@ -72,6 +74,7 @@ public class LogEventConvert {
     private static long                 batchId             = 0;
     private static long                 inId                = 0;
     private static String               ip                  = "";
+    public static Map<String, String> filterMap = new HashMap<String, String>();
 
 
     public void setBatchId(long id) {
@@ -297,6 +300,10 @@ public class LogEventConvert {
             String fullname = table.getDbName() + "." + table.getTableName();
             // check name filter
             if (nameFilter != null && !nameFilter.filter(fullname)) {
+                return null;
+            }
+            // check my filter
+            if(filterMap.containsKey(fullname) == false) {
                 return null;
             }
             CanalEntry.EventType eventType = null;

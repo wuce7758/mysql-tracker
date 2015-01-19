@@ -11,7 +11,7 @@ public class LocalTracker {
 
     public static void main(String[] args) throws Exception {
         final HandlerMagpieKafka handler = new HandlerMagpieKafka();
-        handler.prepare("local-test");
+        handler.prepare("mysql-tracker-json");
         while(running) {
             handler.run();
         }
@@ -19,7 +19,7 @@ public class LocalTracker {
             public void run() {
                 try {
                     running = false;
-                    handler.close("local-test");
+                    handler.close("mysql-tracker-json");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
