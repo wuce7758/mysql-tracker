@@ -113,7 +113,7 @@ public class TrackerConf {
 
     public void initConfOnlineJSON() throws Exception {
         clear();
-        ConfigJson jcnf = new ConfigJson(jobId, "online.address");
+        ConfigJson jcnf = new ConfigJson(jobId, "relase.address");
         JSONObject root = jcnf.getJson();
         //parse the json
         if(root != null) {
@@ -150,14 +150,16 @@ public class TrackerConf {
             //jobId
             jobId = data.getString("job_id");
             //filter load
-            JSONArray jf = data.getJSONArray("db_tab_meta");
-            for(int i = 0; i <= jf.size() - 1; i++) {
-                JSONObject jdata = jf.getJSONObject(i);
-                String dbname = jdata.getString("dbname");
-                String tbname = jdata.getString("tablename");
-                String key = dbname + "." + tbname;
-                String value = tbname;
-                filterMap.put(key, value);
+            if(data.containsKey("db_tab_meta")) {
+                JSONArray jf = data.getJSONArray("db_tab_meta");
+                for (int i = 0; i <= jf.size() - 1; i++) {
+                    JSONObject jdata = jf.getJSONObject(i);
+                    String dbname = jdata.getString("dbname");
+                    String tbname = jdata.getString("tablename");
+                    String key = dbname + "." + tbname;
+                    String value = tbname;
+                    filterMap.put(key, value);
+                }
             }
         }
     }
