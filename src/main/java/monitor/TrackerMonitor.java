@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by hp on 14-9-23.
  */
-public class TrackerMonitor {
+public class TrackerMonitor implements Cloneable {
 
     public long fetchStart;
 
@@ -70,6 +70,20 @@ public class TrackerMonitor {
         sendStart = sendEnd = 0;
         delayTime = 0;
         exMsg = ip = "";
+    }
+
+    public Object clone() {
+        Object o = null;
+        try {
+            o = (TrackerMonitor) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return o;
+    }
+
+    public TrackerMonitor cloneDeep() {
+        return (TrackerMonitor) clone();
     }
 
     public void clear() {

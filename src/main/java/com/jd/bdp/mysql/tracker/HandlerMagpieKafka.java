@@ -793,7 +793,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
                         ",in batch id is :" + globalXidInBatchId);
             //send phoenix monitor
-            final TrackerMonitor phMonitor = monitor;
+            final TrackerMonitor phMonitor = monitor.cloneDeep();
             Thread sendMonitor = new Thread(new Runnable() {
                 @Override
                 public void run() {
