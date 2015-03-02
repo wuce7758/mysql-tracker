@@ -13,6 +13,7 @@ public class SimpleTest {
 //        else System.out.println("not both null , " + ss);
 
         String ss = "a/u0001b/u0001c/u0001d/u0001";
+        System.out.println(ss.lastIndexOf("/u0001"));
         String sa = ss.substring(0, ss.lastIndexOf("/u0001"));
         System.out.println(sa);
     }

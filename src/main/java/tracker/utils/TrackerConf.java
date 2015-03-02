@@ -5,11 +5,15 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import protocol.json.ConfigJson;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by hp on 14-12-12.
@@ -68,6 +72,9 @@ public class TrackerConf {
     //filter same to parser
     public static Map<String, String> filterMap = new HashMap<String, String>();
 
+    //constants
+    private static String confPath = "conf/tracker.properties";
+
 
     public void initConfLocal() {
         brokerSeeds.add("127.0.0.1");
@@ -88,6 +95,34 @@ public class TrackerConf {
         zkKafka = "172.17.36.60/kafka";
         topic = "mysql_log";
         zkServers = "172.17.36.60:2181,172.17.36.61:2181,172.17.36.62:2181";
+    }
+
+    public void initConfFile() throws Exception {
+        clear();
+        InputStream in = new BufferedInputStream(new FileInputStream("conf/tracker.properties"));
+        Properties pro = new Properties();
+        pro.load(in);
+        //load the parameter
+        jobId = pro.getProperty("job.name");
+        charset = Charset.forName(pro.getProperty("job.charset"));
+        address = pro.getProperty("mysql.address");
+        myPort = Integer.valueOf(pro.getProperty("mysql.port"));
+        username = pro.getProperty("mysql.usr");
+        password = pro.getProperty("mysql.psd");
+        slaveId = Long.valueOf(pro.getProperty("mysql.slaveId"));
+        String dataKafkaZk = pro.getProperty("kafka.data.zkserver") + pro.getProperty("kafka.data.zkroot");
+        KafkaConf dataCnf = new KafkaConf();
+        dataCnf.loadZk(dataKafkaZk);
+        brokerList = dataCnf.brokerList;
+        acks = pro.getProperty("kafka.acks");
+        topic = pro.getProperty("kafka.data.topic.tracker");
+        zkServers = pro.getProperty("zookeeper.servers");
+        String monitorKafkaZk = pro.getProperty("kafka.monitor.zkserver") + pro.getProperty("kafka.monitor.zkroot");
+        KafkaConf monitorCnf = new KafkaConf();
+        monitorCnf.loadZk(monitorKafkaZk);
+        phKaBrokerList = monitorCnf.brokerList;
+        phKaTopic = pro.getProperty("kafka.monitor.topic");
+        in.close();
     }
 
     public void initConfJSON() {
