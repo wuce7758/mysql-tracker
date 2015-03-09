@@ -1,348 +1,120 @@
-2015-03-02 14:42:06 HandlerKafkaZkLocal [INFO] preparing......
-2015-03-02 14:42:06 HandlerKafkaZkLocal [INFO] initializing......
-2015-03-02 14:42:08 HandlerKafkaZkLocal [INFO] finding position......
-2015-03-02 14:42:08 HandlerKafkaZkLocal [INFO] start the tracker successfully......
-2015-03-02 14:42:08 HandlerKafkaZkLocal [INFO] find zk position......
-2015-03-02 14:42:08 HandlerKafkaZkLocal [INFO] start position :BinlogPosition.dat:189:1:0
-2015-03-02 14:42:08 HandlerKafkaZkLocal$Fetcher [INFO] set the binlog configuration for the binlog dump
-2015-03-02 14:42:08 HandlerKafkaZkLocal$Fetcher [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
-2015-03-02 14:42:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:42:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:42:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is null,position is :-1; batch id is :-1,in batch id is :-1
-2015-03-02 14:42:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:42:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:42:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:42:49 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 14:42:49 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:40951 ms
-2015-03-02 14:42:49 HandlerKafkaZkLocal [INFO] ---> send time :29 ms
-2015-03-02 14:42:49 HandlerKafkaZkLocal [INFO] ---> parser delay time:1336 ms
-2015-03-02 14:42:49 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 14:42:49 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 14:42:49 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :271; batch id is :2,in batch id is :0
-2015-03-02 14:43:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:43:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:43:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :271; batch id is :2,in batch id is :0
-2015-03-02 14:43:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:43:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 14:43:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 14:44:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:44:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:44:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :271; batch id is :2,in batch id is :0
-2015-03-02 14:44:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:44:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:44:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:45:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:45:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:45:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :271; batch id is :2,in batch id is :0
-2015-03-02 14:45:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:45:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:45:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:46:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:46:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:46:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :271; batch id is :2,in batch id is :0
-2015-03-02 14:46:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:46:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:46:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:47:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:47:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:47:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :271; batch id is :2,in batch id is :0
-2015-03-02 14:47:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:47:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:47:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:47:28 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 14:47:28 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:279238 ms
-2015-03-02 14:47:28 HandlerKafkaZkLocal [INFO] ---> send time :4 ms
-2015-03-02 14:47:28 HandlerKafkaZkLocal [INFO] ---> parser delay time:639 ms
-2015-03-02 14:47:28 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 14:47:28 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 14:47:28 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :353; batch id is :3,in batch id is :0
-2015-03-02 14:48:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:48:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:48:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :353; batch id is :3,in batch id is :0
-2015-03-02 14:48:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:48:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 14:48:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 14:49:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:49:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:49:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :353; batch id is :3,in batch id is :0
-2015-03-02 14:49:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:49:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:49:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:50:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:50:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:50:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :353; batch id is :3,in batch id is :0
-2015-03-02 14:50:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:50:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:50:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:51:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:51:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:51:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :353; batch id is :3,in batch id is :0
-2015-03-02 14:51:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:51:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:51:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:52:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:52:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:52:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :353; batch id is :3,in batch id is :0
-2015-03-02 14:52:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:52:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:52:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:53:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:53:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:53:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :353; batch id is :3,in batch id is :0
-2015-03-02 14:53:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:53:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:53:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:54:04 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 14:54:04 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:395573 ms
-2015-03-02 14:54:04 HandlerKafkaZkLocal [INFO] ---> send time :10 ms
-2015-03-02 14:54:04 HandlerKafkaZkLocal [INFO] ---> parser delay time:204 ms
-2015-03-02 14:54:04 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 14:54:04 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 14:54:04 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :435; batch id is :4,in batch id is :0
-2015-03-02 14:54:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:54:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:54:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :435; batch id is :4,in batch id is :0
-2015-03-02 14:54:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:54:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 14:54:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 14:55:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:55:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:55:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :435; batch id is :4,in batch id is :0
-2015-03-02 14:55:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:55:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:55:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:56:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:56:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:56:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :435; batch id is :4,in batch id is :0
-2015-03-02 14:56:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:56:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:56:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:56:26 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 14:56:26 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:142481 ms
-2015-03-02 14:56:26 HandlerKafkaZkLocal [INFO] ---> send time :4 ms
-2015-03-02 14:56:26 HandlerKafkaZkLocal [INFO] ---> parser delay time:691 ms
-2015-03-02 14:56:26 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 14:56:26 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 14:56:26 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 14:57:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:57:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:57:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 14:57:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:57:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 14:57:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 14:58:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:58:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:58:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 14:58:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:58:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:58:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 14:59:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 14:59:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 14:59:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 14:59:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 14:59:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 14:59:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:00:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:00:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:00:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 15:00:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:00:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:00:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:01:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:01:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:01:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 15:01:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:01:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:01:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:02:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:02:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:02:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 15:02:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:02:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:02:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:03:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:03:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:03:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 15:03:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:03:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:03:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:04:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:04:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:04:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :517; batch id is :5,in batch id is :0
-2015-03-02 15:04:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:04:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:04:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:04:38 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 15:04:38 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:491841 ms
-2015-03-02 15:04:38 HandlerKafkaZkLocal [INFO] ---> send time :26 ms
-2015-03-02 15:04:38 HandlerKafkaZkLocal [INFO] ---> parser delay time:511 ms
-2015-03-02 15:04:38 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 15:04:38 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 15:04:38 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :599; batch id is :6,in batch id is :0
-2015-03-02 15:05:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:05:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:05:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :599; batch id is :6,in batch id is :0
-2015-03-02 15:05:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:05:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 15:05:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 15:06:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:06:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:06:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :599; batch id is :6,in batch id is :0
-2015-03-02 15:06:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:06:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:06:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:07:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:07:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:07:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :599; batch id is :6,in batch id is :0
-2015-03-02 15:07:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:07:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:07:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:08:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:08:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:08:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :599; batch id is :6,in batch id is :0
-2015-03-02 15:08:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:08:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:08:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:09:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:09:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:09:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :599; batch id is :6,in batch id is :0
-2015-03-02 15:09:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:09:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:09:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:09:38 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 15:09:38 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:300237 ms
-2015-03-02 15:09:38 HandlerKafkaZkLocal [INFO] ---> send time :4 ms
-2015-03-02 15:09:38 HandlerKafkaZkLocal [INFO] ---> parser delay time:774 ms
-2015-03-02 15:09:38 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 15:09:38 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 15:09:38 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :681; batch id is :7,in batch id is :0
-2015-03-02 15:10:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:10:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:10:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :681; batch id is :7,in batch id is :0
-2015-03-02 15:10:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:10:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 15:10:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 15:10:36 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 15:10:36 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:57283 ms
-2015-03-02 15:10:36 HandlerKafkaZkLocal [INFO] ---> send time :4 ms
-2015-03-02 15:10:36 HandlerKafkaZkLocal [INFO] ---> parser delay time:1054 ms
-2015-03-02 15:10:36 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 15:10:36 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 15:10:36 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :763; batch id is :8,in batch id is :0
-2015-03-02 15:11:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:11:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:11:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :763; batch id is :8,in batch id is :0
-2015-03-02 15:11:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:11:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 15:11:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 15:12:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:12:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:12:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :763; batch id is :8,in batch id is :0
-2015-03-02 15:12:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:12:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:12:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:13:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:13:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:13:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :763; batch id is :8,in batch id is :0
-2015-03-02 15:13:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:13:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:13:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:13:34 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 15:13:34 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:178101 ms
-2015-03-02 15:13:34 HandlerKafkaZkLocal [INFO] ---> send time :5 ms
-2015-03-02 15:13:34 HandlerKafkaZkLocal [INFO] ---> parser delay time:158 ms
-2015-03-02 15:13:34 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 15:13:34 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 15:13:34 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :845; batch id is :9,in batch id is :0
-2015-03-02 15:14:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:14:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:14:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :845; batch id is :9,in batch id is :0
-2015-03-02 15:14:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:14:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 15:14:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 15:15:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:15:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:15:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :845; batch id is :9,in batch id is :0
-2015-03-02 15:15:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:15:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:15:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:15:30 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 15:15:30 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:116744 ms
-2015-03-02 15:15:30 HandlerKafkaZkLocal [INFO] ---> send time :9 ms
-2015-03-02 15:15:30 HandlerKafkaZkLocal [INFO] ---> parser delay time:897 ms
-2015-03-02 15:15:30 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 15:15:30 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 15:15:30 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:16:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:16:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:16:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:16:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:16:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:1 entries
-2015-03-02 15:16:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :7.82012939453125E-5 MB
-2015-03-02 15:17:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:17:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:17:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:17:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:17:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:17:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:18:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:18:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:18:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:18:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:18:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:18:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:19:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:19:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:19:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:19:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:19:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:19:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:20:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:20:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:20:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:20:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:20:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:20:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:21:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:21:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:21:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:21:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:21:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:21:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:22:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:22:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:22:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:22:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:22:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:22:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:23:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:23:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:23:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:23:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:23:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:23:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:24:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:24:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:24:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:24:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:24:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:24:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:25:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:25:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:25:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:25:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:25:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:25:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:26:09 HandlerKafkaZkLocal$HeartBeat [INFO] =================================> check assembly heartbeats......
-2015-03-02 15:26:09 HandlerKafkaZkLocal$Minuter [INFO] ===================================> per minute thread :
-2015-03-02 15:26:09 HandlerKafkaZkLocal$Minuter [INFO] ---> binlog file is mysql-bin.000231,position is :927; batch id is :10,in batch id is :0
-2015-03-02 15:26:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ==============> per minute fetch monitor:
-2015-03-02 15:26:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch number of entry:0 entries
-2015-03-02 15:26:10 HandlerKafkaZkLocal$Fetcher$FetchMonitorMin [INFO] ---> fetch sum size :0.0 MB
-2015-03-02 15:26:21 HandlerKafkaZkLocal [INFO] ===================================> persistence thread / monitor:
-2015-03-02 15:26:21 HandlerKafkaZkLocal [INFO] ---> persistence deal during time:650874 ms
-2015-03-02 15:26:21 HandlerKafkaZkLocal [INFO] ---> send time :25 ms
-2015-03-02 15:26:21 HandlerKafkaZkLocal [INFO] ---> parser delay time:762 ms
-2015-03-02 15:26:21 HandlerKafkaZkLocal [INFO] ---> the number of entry list: 1 entries
-2015-03-02 15:26:21 HandlerKafkaZkLocal [INFO] ---> entry list to bytes sum size is 1.10626220703125E-4 MB
-2015-03-02 15:26:21 HandlerKafkaZkLocal [INFO] ---> position info: binlog file is mysql-bin.000231,position is :1009; batch id is :11,in batch id is :0
+2015-03-09 15:57:29 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 15:58:02 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 15:58:03 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 15:58:03 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 15:58:04 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 15:58:04 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] ddl : truncate test
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#107
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] position : mysql-bin.000238#189
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] position : mysql-bin.000238#351
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] position : mysql-bin.000238#378
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] position : mysql-bin.000238#540
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:03:56 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:03:59 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:04:00 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:04:00 SimpleMysqlTracker [INFO] position : mysql-bin.000238#567
+2015-03-09 16:05:12 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:05:19 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:05:21 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:05:21 SimpleMysqlTracker [INFO] position : mysql-bin.000238#729
+2015-03-09 16:08:18 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:08:26 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:08:30 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:08:35 SimpleMysqlTracker [INFO] position : mysql-bin.000238#756
+2015-03-09 16:10:35 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:10:36 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:10:37 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:10:37 SimpleMysqlTracker [INFO] position : mysql-bin.000238#918
+2015-03-09 16:10:51 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:10:52 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:10:52 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:10:53 SimpleMysqlTracker [INFO] position : mysql-bin.000238#945
+2015-03-09 16:12:10 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:12:10 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:12:11 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:12:11 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1107
+2015-03-09 16:12:20 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:12:21 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:12:21 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:12:21 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1134
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1296
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1323
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1449
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1485
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1512
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1638
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1674
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1827
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:24:58 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] position : mysql-bin.000238#2016

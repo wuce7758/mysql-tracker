@@ -73,7 +73,7 @@ public class TrackerConf {
     public static Map<String, String> filterMap = new HashMap<String, String>();
 
     //constants
-    private static String confPath = "conf/tracker.properties";
+    private static String confPath = "tracker.properties";
 
 
     public void initConfLocal() {
@@ -99,7 +99,7 @@ public class TrackerConf {
 
     public void initConfFile() throws Exception {
         clear();
-        InputStream in = new BufferedInputStream(new FileInputStream("conf/tracker.properties"));
+        InputStream in = new BufferedInputStream(new FileInputStream(confPath));
         Properties pro = new Properties();
         pro.load(in);
         //load the parameter
