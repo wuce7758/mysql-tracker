@@ -20,9 +20,12 @@ import tracker.parser.LogEventConvert;
 import tracker.position.EntryPosition;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by hp on 15-3-9.
@@ -30,11 +33,11 @@ import java.util.List;
 public class SimpleMysqlTracker {
 
     //static
-    private static final String addr = "127.0.0.1";
-    private static final int port = 3306;
-    private static final String username = "canal";
-    private static final String password = "canal";
-    private static final long slaveId = 9876;
+    private static  String addr = "127.0.45.1";
+    private static  int port = 3306;
+    private static  String username = "canal";
+    private static  String password = "canalssss";
+    private static  long slaveId = 9876;
 
 
     private Logger logger = LoggerFactory.getLogger(SimpleMysqlTracker.class);
@@ -49,8 +52,20 @@ public class SimpleMysqlTracker {
     private LogDecoder decoder;
     private LogContext context;
 
+    private void loadConf() throws Exception {
+        URL url = new URL("https://raw.githubusercontent.com/hackerwin7/configuration-service/master/simple-tracker.properties");
+        InputStream in = url.openStream();
+        Properties po = new Properties();
+        po.load(in);
+        addr = po.getProperty("address");
+        port = Integer.valueOf(po.getProperty("port"));
+        slaveId = Long.valueOf(po.getProperty("slaveId"));
+        username = po.getProperty("username");
+        password = po.getProperty("password");
+    }
 
     private void preDump() throws Exception {
+        loadConf();
         logger.info("prepare dump mysql......");
         connector = new MysqlConnector(new InetSocketAddress(addr, port), username, password);
         connectorTable = new MysqlConnector(new InetSocketAddress(addr, port), username, password);
