@@ -303,7 +303,7 @@ public class LogEventConvert {
                 return null;
             }
             // check my filter
-            if(filterMap.containsKey(fullname) == false) {
+            if(filterMap.size() > 0 && filterMap.containsKey(fullname) == false) {
                 return null;
             }
             CanalEntry.EventType eventType = null;

@@ -78,7 +78,6 @@ public class SimpleMysqlTracker {
         tableMetaCache = new TableMetaCache(connectorTable);
         eventParser = new LogEventConvert();
         eventParser.setTableMetaCache(tableMetaCache);
-        eventParser.filterMap.put("canal_test.test", "test");
     }
 
     private EntryPosition findStartPosition() throws IOException {
@@ -110,7 +109,6 @@ public class SimpleMysqlTracker {
         dmpHeader.setPacketSequenceNumber((byte) 0x00);
         PacketManager.write(connector.getChannel(), new ByteBuffer[]{ByteBuffer.wrap(dmpHeader.toBytes()), ByteBuffer.wrap(dmpBody)});
         //initialize the mysql.dbsync to fetch the binlog data
-        logger.info("initialize the mysql.dbsync class");
         fetcher = new DirectLogFetcherChannel(connector.getReceiveBufferSize());
         fetcher.start(connector.getChannel());
         decoder = new LogDecoder(LogEvent.UNKNOWN_EVENT, LogEvent.ENUM_END_EVENT);
@@ -127,17 +125,42 @@ public class SimpleMysqlTracker {
 
     private void printEvent(LogEvent event) throws Exception {
         CanalEntry.Entry entry = eventParser.parse(event);
-        if(entry == null) return;
+        if(entry == null) {
+            logger.info("null entry!!!");
+            return;
+        }
         CanalEntry.RowChange rowChange = CanalEntry.RowChange.parseFrom(entry.getStoreValue());
         if(rowChange.getIsDdl()) {
             logger.info("--------------------------------------------------entry----------------------------------------------------");
             logger.info("ddl : " + rowChange.getSql());
+            logger.info("event time :" + entry.getHeader().getExecuteTime());
         } else if(entry.getEntryType() == CanalEntry.EntryType.ROWDATA) {
             logger.info("--------------------------------------------------entry----------------------------------------------------");
             logger.info("dml : " + rowChange.getSql());
+            logger.info("event time : " + entry.getHeader().getExecuteTime());
+            logger.info("====================== rowdata ==============");
+            for(CanalEntry.RowData rowData : rowChange.getRowDatasList()) {
+                if(rowChange.getEventType() == CanalEntry.EventType.DELETE) {
+                    List<CanalEntry.Column> columns = rowData.getBeforeColumnsList();
+                    for (CanalEntry.Column column : columns) {
+                        logger.info(column.getName() + ":" + column.getValue());
+                    }
+                } else if (rowChange.getEventType() == CanalEntry.EventType.INSERT) {
+                    List<CanalEntry.Column> columns = rowData.getAfterColumnsList();
+                    for (CanalEntry.Column column : columns) {
+                        logger.info(column.getName() + ":" + column.getValue());
+                    }
+                } else if ((rowChange.getEventType() == CanalEntry.EventType.UPDATE)) {
+                    List<CanalEntry.Column> columns = rowData.getAfterColumnsList();
+                    for (CanalEntry.Column column : columns) {
+                        logger.info(column.getName() + ":" + column.getValue());
+                    }
+                }
+            }
         } else {
             return;
         }
+        logger.info("---------- summary -------");
         logger.info("dbname.tbname : " + entry.getHeader().getSchemaName() + "." + entry.getHeader().getTableName());
         logger.info("position : " + entry.getHeader().getLogfileName() + "#" + entry.getHeader().getLogfileOffset());
     }

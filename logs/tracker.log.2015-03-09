@@ -1,0 +1,129 @@
+2015-03-09 15:57:29 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 15:58:02 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 15:58:03 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 15:58:03 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 15:58:04 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 15:58:04 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 15:58:54 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] ddl : truncate test
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 15:59:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#107
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] position : mysql-bin.000238#189
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:00:09 SimpleMysqlTracker [INFO] position : mysql-bin.000238#351
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] position : mysql-bin.000238#378
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:01:38 SimpleMysqlTracker [INFO] position : mysql-bin.000238#540
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:02:35 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:03:56 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:03:59 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:04:00 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:04:00 SimpleMysqlTracker [INFO] position : mysql-bin.000238#567
+2015-03-09 16:05:12 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:05:19 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:05:21 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:05:21 SimpleMysqlTracker [INFO] position : mysql-bin.000238#729
+2015-03-09 16:08:18 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:08:26 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:08:30 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:08:35 SimpleMysqlTracker [INFO] position : mysql-bin.000238#756
+2015-03-09 16:10:35 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:10:36 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:10:37 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:10:37 SimpleMysqlTracker [INFO] position : mysql-bin.000238#918
+2015-03-09 16:10:51 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:10:52 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:10:52 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:10:53 SimpleMysqlTracker [INFO] position : mysql-bin.000238#945
+2015-03-09 16:12:10 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:12:10 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:12:11 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:12:11 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1107
+2015-03-09 16:12:20 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:12:21 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:12:21 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:12:21 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1134
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:13:44 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1296
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:19:22 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1323
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1449
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:19:29 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1485
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:22:36 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1512
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1638
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] dbname.tbname : .
+2015-03-09 16:22:40 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1674
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:23:55 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] position : mysql-bin.000238#1827
+2015-03-09 16:23:58 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:24:58 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 16:24:59 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] dml : 
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 16:25:01 SimpleMysqlTracker [INFO] position : mysql-bin.000238#2016
+2015-03-09 17:08:14 SimpleMysqlTracker [INFO] prepare dump mysql......
+2015-03-09 17:08:14 SimpleMysqlTracker [INFO] finding start position......
+2015-03-09 17:08:14 SimpleMysqlTracker [INFO] set the binlog configuration for the binlog dump
+2015-03-09 17:08:14 SimpleMysqlTracker [INFO] send the binlog dump packet to mysql , let mysql set up a binlog dump thread in mysql
+2015-03-09 17:08:14 SimpleMysqlTracker [INFO] initialize the mysql.dbsync class
+2015-03-09 17:08:32 SimpleMysqlTracker [INFO] --------------------------------------------------entry----------------------------------------------------
+2015-03-09 17:08:32 SimpleMysqlTracker [INFO] ddl : truncate canal_test.test
+2015-03-09 17:08:32 SimpleMysqlTracker [INFO] dbname.tbname : canal_test.test
+2015-03-09 17:08:32 SimpleMysqlTracker [INFO] position : mysql-bin.000238#2079
