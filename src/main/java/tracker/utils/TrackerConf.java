@@ -71,6 +71,11 @@ public class TrackerConf {
     public Charset charset = Charset.forName("UTF-8");
     //filter same to parser
     public static Map<String, String> filterMap = new HashMap<String, String>();
+    //position
+    public String logfile = null;
+    public long offset = -1;
+    public long batchId = 0;
+    public long inId = 0;
 
     //constants
     private static String confPath = "tracker.properties";
@@ -195,6 +200,19 @@ public class TrackerConf {
                     String value = tbname;
                     filterMap.put(key, value);
                 }
+            }
+            //load position
+            if(data.containsKey("position-logfile")) {
+                logfile = data.getString("position-logfile");
+            }
+            if(data.containsKey("position-offset")) {
+                offset = Long.valueOf(data.getString("position-offset"));
+            }
+            if(data.containsKey("position-bid")) {
+                batchId = Long.valueOf(data.getString("position-bid"));
+            }
+            if(data.containsKey("position-iid")) {
+                inId = Long.valueOf(data.getString("position-iid"));
             }
         }
     }

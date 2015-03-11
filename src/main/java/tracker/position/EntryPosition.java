@@ -94,7 +94,7 @@ public class EntryPosition {
     }
 
     public String getBinlogPosFileName() {
-        return binlogPosFileName;
+        return journalName;
     }
 
     public String getEntryBytesWritePosFileName() {

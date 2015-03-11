@@ -80,6 +80,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     //batch id and in batch id
     private long batchId = 0;
     private long inBatchId = 0;
+    private String logfile;
+    private long offset;
     //thread communicate
     private int globalFetchThread = 0;
     //global var
@@ -135,6 +137,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         config.initConfOnlineJSON();//config.initConfJSON();//config.initConfStatic();
         //jobId
         jobId = config.jobId;
+        //load position
+        logfile = config.logfile;
+        offset = config.offset;
+        batchId = config.batchId;
+        inBatchId = config.inId;
         //phoenix monitor kafka
         KafkaConf kpcnf = new KafkaConf();
         kpcnf.brokerList = config.phKaBrokerList;
@@ -264,9 +271,6 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         heartBeat = new HeartBeat();
         //monitor
         monitor = new TrackerMonitor();
-        //batch id
-        batchId = 0;
-        inBatchId = 0;
         //global var
         entryList = new ArrayList<CanalEntry.Entry>();
         messageList = new ArrayList<KeyedMessage<String, byte[]>>();
@@ -339,14 +343,23 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             String zkPos = config.persisPath + "/" + jobId;
             String getStr = zkExecutor.get(zkPos);
             if(getStr == null || getStr.equals("")) {
-                logger.info("find mysql show master status......");
-                returnPos = findPosFromMysqlNow();
-                batchId = 0;
-                inBatchId = 0;
-                logger.info("start position :" + returnPos.getBinlogPosFileName()+":"+returnPos.getPosition()+
-                        ":"+batchId+
-                        ":"+inBatchId);
-                return returnPos;
+                if(offset <= 0) {
+                    logger.info("find mysql show master status......");
+                    returnPos = findPosFromMysqlNow();
+                    batchId = 0;
+                    inBatchId = 0;
+                    logger.info("start position :" + returnPos.getBinlogPosFileName() + ":" + returnPos.getPosition() +
+                            ":" + batchId +
+                            ":" + inBatchId);
+                    return returnPos;
+                } else {
+                    logger.info("find mysql position from configuration......");
+                    returnPos = new EntryPosition(logfile, offset);
+                    logger.info("start position :" + returnPos.getBinlogPosFileName() + ":" + returnPos.getPosition() +
+                            ":" + batchId +
+                            ":" + inBatchId);
+                    return returnPos;
+                }
             }
             String[] ss = getStr.split(":");
             if(ss.length != 4) {
