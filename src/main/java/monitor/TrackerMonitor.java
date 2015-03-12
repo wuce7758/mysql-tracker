@@ -57,6 +57,8 @@ public class TrackerMonitor implements Cloneable {
 
     public long delayTime;
 
+    public double delayNum;
+
     public String exMsg;
 
     public String ip;
@@ -69,6 +71,7 @@ public class TrackerMonitor implements Cloneable {
         fetcherStart = fetcherEnd = decodeStart = decodeEnd = 0;
         sendStart = sendEnd = 0;
         delayTime = 0;
+        delayNum = 0;
         exMsg = ip = "";
     }
 
@@ -155,12 +158,14 @@ public class TrackerMonitor implements Cloneable {
         Map<String, Long> content = new HashMap<String, Long>();
         Map<String, String> msgContent = new HashMap<String, String>();
         Map<String, String> IPContent = new HashMap<String, String>();
+        Map<String, Object> newContent = new HashMap<String, Object>();
         JSONObject jo;
         switch (id) {
             case JDMysqlTrackerMonitorType.FETCH_MONITOR:
-                content.put(JDMysqlTrackerMonitorType.FETCH_ROWS, fetchNum);
-                content.put(JDMysqlTrackerMonitorType.FETCH_SIZE, batchSize);
-                jo = JSONConvert.MapToJson(content);
+                newContent.put(JDMysqlTrackerMonitorType.FETCH_ROWS, fetchNum);
+                newContent.put(JDMysqlTrackerMonitorType.FETCH_SIZE, batchSize);
+                newContent.put(JDMysqlTrackerMonitorType.DELAY_NUM, delayNum);
+                jo = JSONConvert.MapToJson(newContent);
                 break;
             case JDMysqlTrackerMonitorType.PERSIS_MONITOR:
                 content.put(JDMysqlTrackerPhenix.SEND_ROWS, persisNum);

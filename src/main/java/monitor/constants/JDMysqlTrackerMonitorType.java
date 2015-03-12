@@ -15,6 +15,7 @@ public class JDMysqlTrackerMonitorType {
     // fetch
     public static final String FETCH_ROWS = "FETCH_ROWS";
     public static final String FETCH_SIZE = "FETCH_SIZE";
+    public static final String DELAY_NUM = "DELAY_NUM";
 
     // persistence
     public static final String SEND_ROWS = "SEND_ROWS";

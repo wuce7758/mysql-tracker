@@ -336,6 +336,23 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         return returnPos;
     }
 
+    private EntryPosition findPosFromMysqlNow(MysqlQueryExecutor executor) {
+        if(executor == null) return null;
+        EntryPosition pos = null;
+        try {
+            ResultSetPacket packet = executor.query("show master status");
+            List<String> fields = packet.getFieldValues();
+            if(CollectionUtils.isEmpty(fields)) {
+                throw new Exception("show master status failed");
+            }
+            pos = new EntryPosition(fields.get(0), Long.valueOf(fields.get(1)));
+        } catch (Exception e) {
+            logger.error("show master status error!!!");
+            e.printStackTrace();
+        }
+        return pos;
+    }
+
     private EntryPosition findPosFromZk() {
         logger.info("finding position......");
         EntryPosition returnPos = null;
@@ -428,20 +445,56 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         private TrackerMonitor minuteMonitor = new TrackerMonitor();
         public FetchMonitorMin timerMonitor = new FetchMonitorMin();
         public Timer timer = new Timer();
+        public CanalEntry.Entry fetchLast;
 
         public boolean iskilled = false;
 
         class FetchMonitorMin extends TimerTask {
             private Logger logger = LoggerFactory.getLogger(FetchMonitorMin.class);
 
+            private long getRearNum(String str) {
+                long ret = 0;
+                for(int i = str.length() - 1; i >= 0; i--) {
+                    if(!Character.isDigit(str.charAt(i))) {
+                        String substr = str.substring(i + 1, str.length());
+                        ret = Long.valueOf(substr);
+                        break;
+                    }
+                }
+                if(ret == 0) {
+                    ret = Long.valueOf(str);
+                }
+                return ret;
+            }
+
+            private double getDelayNum(String logfile1, long pos1, String logfile2, long pos2) {
+                long filenum1 = getRearNum(logfile1);
+                long filenum2 = getRearNum(logfile2);
+                long subnum1 = filenum1 - filenum2;
+                long subnum2 = pos1 - pos2;
+                if(subnum1 != 0) {
+                    subnum2 = pos1;
+                }
+                String s = subnum1 + "." +subnum2;
+                double ret = Double.valueOf(s);
+                return  ret;
+            }
+
             public void run() {
                 try {
                     logger.info("==============> per minute fetch monitor:");
                     logger.info("---> fetch number of entry:" + minuteMonitor.fetchNum + " entries");
                     logger.info("---> fetch sum size :" + minuteMonitor.batchSize / config.mbUnit + " MB");
+                    //set delay num monitor
+                    EntryPosition pos = findPosFromMysqlNow(realQuery);
+                    minuteMonitor.delayNum = 0;
+                    if(fetchLast != null && pos != null) {
+                        minuteMonitor.delayNum = getDelayNum(pos.getJournalName(), pos.getPosition(), fetchLast.getHeader().getLogfileName(), fetchLast.getHeader().getLogfileOffset());
+                    }
                     //send monitor phenix
                     JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.FETCH_MONITOR, jobId);
                     String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                    logger.info("!!!debug: " + jsonStr + ";master:" + pos.getJournalName() + "#" + pos.getPosition() + ";fetch:" + fetchLast.getHeader().getLogfileName() + "#" + fetchLast.getHeader().getLogfileOffset());
                     KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                     phMonitorSender.sendKeyMsg(km);
                     minuteMonitor.clear();
@@ -468,6 +521,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     if(entry == null) continue;
                     //add the entry to the queue
                     entryQueue.put(entry);
+                    fetchLast = entry;
                     counter++;
                     minuteMonitor.fetchNum++;
                     monitor.batchSize += event.getEventLen();
