@@ -5,8 +5,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import protocol.json.ConfigJson;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -104,7 +102,7 @@ public class TrackerConf {
 
     public void initConfFile() throws Exception {
         clear();
-        InputStream in = new BufferedInputStream(new FileInputStream(confPath));
+        InputStream in = TrackerConf.class.getClassLoader().getResourceAsStream(confPath);
         Properties pro = new Properties();
         pro.load(in);
         //load the parameter

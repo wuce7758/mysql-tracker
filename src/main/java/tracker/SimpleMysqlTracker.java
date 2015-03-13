@@ -52,7 +52,7 @@ public class SimpleMysqlTracker {
     private LogDecoder decoder;
     private LogContext context;
 
-    private void loadConf() throws Exception {
+    private void loadOnlineConf() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/hackerwin7/configuration-service/master/simple-tracker.properties");
         InputStream in = url.openStream();
         Properties po = new Properties();
@@ -64,8 +64,19 @@ public class SimpleMysqlTracker {
         password = po.getProperty("password");
     }
 
+    private void loadFileConf() throws Exception {
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("simple-tracker.properties");
+        Properties po = new Properties();
+        po.load(in);
+        addr = po.getProperty("address");
+        port = Integer.valueOf(po.getProperty("port"));
+        slaveId = Long.valueOf(po.getProperty("slaveId"));
+        username = po.getProperty("username");
+        password = po.getProperty("password");
+    }
+
     private void preDump() throws Exception {
-        loadConf();
+        loadFileConf();
         logger.info("prepare dump mysql......");
         connector = new MysqlConnector(new InetSocketAddress(addr, port), username, password);
         connectorTable = new MysqlConnector(new InetSocketAddress(addr, port), username, password);

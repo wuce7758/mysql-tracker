@@ -247,7 +247,8 @@
                 </executions>
                 <configuration>
                     <descriptors>
-                        <descriptor>assembly-magpie.xml</descriptor>
+                        <!--<descriptor>assembly-magpie.xml</descriptor>-->
+                        <descriptor>/src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>
