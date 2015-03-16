@@ -92,7 +92,7 @@ then
     echo conf : $conf
     echo CLASSPATH : $CLASSPATH
     cd $base
-    $JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $TRACKER_OPTS -classpath .:$CLASSPATH deployer.SimpleLocalTracker 1>>$base/logs/tracker/tracker.log 2>&1 &
+    $JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $TRACKER_OPTS -classpath .:$CLASSPATH deployer.SimpleLocalTracker 1>>$base/logs/tracker/console.log 2>&1 &
     echo $! > $base/bin/tracker.pid
 
     echo "cd to $current_path for continue"
