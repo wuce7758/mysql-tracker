@@ -499,6 +499,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     phMonitorSender.sendKeyMsg(km);
                     minuteMonitor.clear();
                 } catch (Exception e) {
+                    logger.error(e.getMessage());
                     e.printStackTrace();
                 }
             }

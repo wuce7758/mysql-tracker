@@ -6,7 +6,7 @@
 
     <groupId>mysql-tracker</groupId>
     <artifactId>mysql-tracker</artifactId>
-    <version>1.1.5.2</version>
+    <version>1.1.5.3</version>
 
 
     <dependencies>
@@ -248,7 +248,7 @@
                 <configuration>
                     <descriptors>
                         <!--<descriptor>assembly-magpie.xml</descriptor>-->
-                        <descriptor>/src/main/assembly/assembly.xml</descriptor>
+                        <descriptor>assembly-magpie.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>
