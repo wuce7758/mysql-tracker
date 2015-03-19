@@ -108,6 +108,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private CanalEntry.Entry lastEntry = null;
     private String binlog = null;
     private List<KeyedMessage<String, byte[]>> messageList;
+    //thread survival confirmation
+    private boolean fetchSurvival = true;
     //debug var
 
     //delay time
@@ -408,6 +410,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             return;
         }
         //start thread
+        fetchSurvival = true;
         fetcher.start();
         timer.schedule(minter, 1000, config.minsec * 1000);
         htimer.schedule(heartBeat, 1000, config.heartsec * 1000);
@@ -467,13 +470,16 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 return ret;
             }
 
-            private double getDelayNum(String logfile1, long pos1, String logfile2, long pos2) {
+            private double getDelayNum(String logfile1, long pos1, String logfile2, long pos2) throws Exception {
                 long filenum1 = getRearNum(logfile1);
                 long filenum2 = getRearNum(logfile2);
                 long subnum1 = filenum1 - filenum2;
                 long subnum2 = pos1 - pos2;
                 if(subnum1 != 0) {
                     subnum2 = pos1;
+                }
+                if(subnum2 < 0) {
+                    subnum2 = 0;
                 }
                 String s = subnum1 + "." +subnum2;
                 double ret = Double.valueOf(s);
@@ -491,6 +497,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     if(fetchLast != null && pos != null) {
                         minuteMonitor.delayNum = getDelayNum(pos.getJournalName(), pos.getPosition(), fetchLast.getHeader().getLogfileName(), fetchLast.getHeader().getLogfileOffset());
                     }
+                    logger.info("---> fetch delay num :" + minuteMonitor.delayNum);
                     //send monitor phenix
                     JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.FETCH_MONITOR, jobId);
                     String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
@@ -578,7 +585,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 }
                 //all exception we will reload the job
                 globalFetchThread = 1;
+                return;
             }
+            fetchSurvival = false;
         }
 
         private void init() throws Exception {
@@ -763,6 +772,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             //check zk connection
             if(!zkExecutor.isConnected()) {
                 logger.info("zookeeper connection loss, reload the job ......");
+                globalFetchThread = 1;
+                return;
+            }
+            //check fetch survival
+            if(!fetchSurvival) {
+                logger.info("fetch thread had been dead, reload the job ......");
                 globalFetchThread = 1;
                 return;
             }
@@ -1111,6 +1126,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     }
 
     public void close(String id) throws Exception {
+        logger.info("closing......");
         fetcher.iskilled = true;//stop the fetcher thread
         fetcher.shutdown();//stop the fetcher's timer task
         minter.cancel();//stop the per minute record
