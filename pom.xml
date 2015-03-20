@@ -6,7 +6,7 @@
 
     <groupId>mysql-tracker</groupId>
     <artifactId>mysql-tracker</artifactId>
-    <version>1.1.5.6</version>
+    <version>1.1.5.6.1</version>
 
 
     <dependencies>
@@ -235,6 +235,21 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>true</addMavenDescriptor>
+                    </archive>
+                    <excludes>
+                        <exclude>**/tracker.properties</exclude>
+                        <exclude>**/simple-tracker.properties</exclude>
+                        <exclude>**/log4j.properties</exclude>
+                        <exclude>**/input_config.yaml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.1</version>
                 <executions>
@@ -248,7 +263,7 @@
                 <configuration>
                     <descriptors>
                         <!--<descriptor>assembly-magpie.xml</descriptor>-->
-                        <descriptor>assembly-magpie.xml</descriptor>
+                        <descriptor>/src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>

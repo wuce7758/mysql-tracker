@@ -3,8 +3,12 @@ package tracker.utils;
 import kafka.utils.KafkaConf;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import protocol.json.ConfigJson;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -17,6 +21,8 @@ import java.util.Properties;
  * Created by hp on 14-12-12.
  */
 public class TrackerConf {
+    public Logger logger = LoggerFactory.getLogger(TrackerConf.class);
+
     //mysql conf
     public String username = "canal";
     public String password = "canal";
@@ -50,7 +56,7 @@ public class TrackerConf {
     public String filterRegex = ".*\\..*";
     public int minsec = 60;
     public int heartsec = 1 * 60;//10
-    public int retrys = 100;//if we retry 100 connect or send failed too, we will reload the job //interval time
+    public int retrys = 10;//if we retry 100 connect or send failed too, we will reload the job //interval time
     public double mbUnit = 1024.0 * 1024.0;
     public String jobId = "mysql-tracker";
     public int spacesize = 8;//8 MB
@@ -74,6 +80,7 @@ public class TrackerConf {
     public long offset = -1;
     public long batchId = 0;
     public long inId = 0;
+    public String CLASS_PREFIX = "classpath:";
 
     //constants
     private static String confPath = "tracker.properties";
@@ -102,7 +109,15 @@ public class TrackerConf {
 
     public void initConfFile() throws Exception {
         clear();
-        InputStream in = TrackerConf.class.getClassLoader().getResourceAsStream(confPath);
+        String cnf = System.getProperty("tracker.conf", "classpath:tracker.properties");
+        logger.info("load file : " + cnf);
+        InputStream in = null;
+        if(cnf.startsWith(CLASS_PREFIX)) {
+            cnf = StringUtils.substringAfter(cnf, CLASS_PREFIX);
+            in = TrackerConf.class.getClassLoader().getResourceAsStream(cnf);
+        } else {
+            in = new FileInputStream(cnf);
+        }
         Properties pro = new Properties();
         pro.load(in);
         //load the parameter

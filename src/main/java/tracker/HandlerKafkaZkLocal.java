@@ -1,13 +1,14 @@
 package tracker;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.jd.bdp.monitors.constants.JDMysqlTrackerMonitorType;
+import com.jd.bdp.magpie.MagpieExecutor;
 import filter.FilterMatcher;
 import kafka.driver.producer.KafkaSender;
 import kafka.producer.KeyedMessage;
 import kafka.utils.KafkaConf;
 import monitor.JrdwMonitorVo;
 import monitor.TrackerMonitor;
+import com.jd.bdp.monitors.constants.JDMysqlTrackerMonitorType;
 import mysql.dbsync.DirectLogFetcherChannel;
 import mysql.dbsync.LogContext;
 import mysql.dbsync.LogDecoder;
@@ -48,10 +49,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by hp on 15-3-2.
+ * Created by hp on 14-12-12.
  */
-public class HandlerKafkaZkLocal {
-
+public class HandlerKafkaZkLocal implements MagpieExecutor {
     //logger
     private Logger logger = LoggerFactory.getLogger(HandlerKafkaZkLocal.class);
     //global config
@@ -80,6 +80,8 @@ public class HandlerKafkaZkLocal {
     //batch id and in batch id
     private long batchId = 0;
     private long inBatchId = 0;
+    private String logfile;
+    private long offset;
     //thread communicate
     private int globalFetchThread = 0;
     //global var
@@ -106,6 +108,8 @@ public class HandlerKafkaZkLocal {
     private CanalEntry.Entry lastEntry = null;
     private String binlog = null;
     private List<KeyedMessage<String, byte[]>> messageList;
+    //thread survival confirmation
+    private boolean fetchSurvival = true;
     //debug var
 
     //delay time
@@ -135,6 +139,11 @@ public class HandlerKafkaZkLocal {
         config.initConfFile();//config.initConfJSON();//config.initConfStatic();
         //jobId
         jobId = config.jobId;
+        //load position
+        logfile = config.logfile;
+        offset = config.offset;
+        batchId = config.batchId;
+        inBatchId = config.inId;
         //phoenix monitor kafka
         KafkaConf kpcnf = new KafkaConf();
         kpcnf.brokerList = config.phKaBrokerList;
@@ -264,9 +273,6 @@ public class HandlerKafkaZkLocal {
         heartBeat = new HeartBeat();
         //monitor
         monitor = new TrackerMonitor();
-        //batch id
-        batchId = 0;
-        inBatchId = 0;
         //global var
         entryList = new ArrayList<CanalEntry.Entry>();
         messageList = new ArrayList<KeyedMessage<String, byte[]>>();
@@ -332,6 +338,23 @@ public class HandlerKafkaZkLocal {
         return returnPos;
     }
 
+    private EntryPosition findPosFromMysqlNow(MysqlQueryExecutor executor) {
+        if(executor == null) return null;
+        EntryPosition pos = null;
+        try {
+            ResultSetPacket packet = executor.query("show master status");
+            List<String> fields = packet.getFieldValues();
+            if(CollectionUtils.isEmpty(fields)) {
+                throw new Exception("show master status failed");
+            }
+            pos = new EntryPosition(fields.get(0), Long.valueOf(fields.get(1)));
+        } catch (Exception e) {
+            logger.error("show master status error!!!");
+            e.printStackTrace();
+        }
+        return pos;
+    }
+
     private EntryPosition findPosFromZk() {
         logger.info("finding position......");
         EntryPosition returnPos = null;
@@ -339,14 +362,23 @@ public class HandlerKafkaZkLocal {
             String zkPos = config.persisPath + "/" + jobId;
             String getStr = zkExecutor.get(zkPos);
             if(getStr == null || getStr.equals("")) {
-                logger.info("find mysql show master status......");
-                returnPos = findPosFromMysqlNow();
-                batchId = 0;
-                inBatchId = 0;
-                logger.info("start position :" + returnPos.getBinlogPosFileName()+":"+returnPos.getPosition()+
-                        ":"+batchId+
-                        ":"+inBatchId);
-                return returnPos;
+                if(offset <= 0) {
+                    logger.info("find mysql show master status......");
+                    returnPos = findPosFromMysqlNow();
+                    batchId = 0;
+                    inBatchId = 0;
+                    logger.info("start position :" + returnPos.getBinlogPosFileName() + ":" + returnPos.getPosition() +
+                            ":" + batchId +
+                            ":" + inBatchId);
+                    return returnPos;
+                } else {
+                    logger.info("find mysql position from configuration......");
+                    returnPos = new EntryPosition(logfile, offset);
+                    logger.info("start position :" + returnPos.getBinlogPosFileName() + ":" + returnPos.getPosition() +
+                            ":" + batchId +
+                            ":" + inBatchId);
+                    return returnPos;
+                }
             }
             String[] ss = getStr.split(":");
             if(ss.length != 4) {
@@ -378,6 +410,7 @@ public class HandlerKafkaZkLocal {
             return;
         }
         //start thread
+        fetchSurvival = true;
         fetcher.start();
         timer.schedule(minter, 1000, config.minsec * 1000);
         htimer.schedule(heartBeat, 1000, config.heartsec * 1000);
@@ -415,24 +448,65 @@ public class HandlerKafkaZkLocal {
         private TrackerMonitor minuteMonitor = new TrackerMonitor();
         public FetchMonitorMin timerMonitor = new FetchMonitorMin();
         public Timer timer = new Timer();
+        public CanalEntry.Entry fetchLast;
 
         public boolean iskilled = false;
 
         class FetchMonitorMin extends TimerTask {
             private Logger logger = LoggerFactory.getLogger(FetchMonitorMin.class);
 
+            private long getRearNum(String str) {
+                long ret = 0;
+                for(int i = str.length() - 1; i >= 0; i--) {
+                    if(!Character.isDigit(str.charAt(i))) {
+                        String substr = str.substring(i + 1, str.length());
+                        ret = Long.valueOf(substr);
+                        break;
+                    }
+                }
+                if(ret == 0) {
+                    ret = Long.valueOf(str);
+                }
+                return ret;
+            }
+
+            private double getDelayNum(String logfile1, long pos1, String logfile2, long pos2) throws Exception {
+                long filenum1 = getRearNum(logfile1);
+                long filenum2 = getRearNum(logfile2);
+                long subnum1 = filenum1 - filenum2;
+                long subnum2 = pos1 - pos2;
+                if(subnum1 != 0) {
+                    subnum2 = pos1;
+                }
+                if(subnum2 < 0) {
+                    subnum2 = 0;
+                }
+                String s = subnum1 + "." +subnum2;
+                double ret = Double.valueOf(s);
+                return  ret;
+            }
+
             public void run() {
                 try {
                     logger.info("==============> per minute fetch monitor:");
                     logger.info("---> fetch number of entry:" + minuteMonitor.fetchNum + " entries");
                     logger.info("---> fetch sum size :" + minuteMonitor.batchSize / config.mbUnit + " MB");
+                    //set delay num monitor
+                    EntryPosition pos = findPosFromMysqlNow(realQuery);
+                    minuteMonitor.delayNum = 0;
+                    if(fetchLast != null && pos != null) {
+                        minuteMonitor.delayNum = getDelayNum(pos.getJournalName(), pos.getPosition(), fetchLast.getHeader().getLogfileName(), fetchLast.getHeader().getLogfileOffset());
+                    }
+                    logger.info("---> fetch delay num :" + minuteMonitor.delayNum);
                     //send monitor phenix
                     JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.FETCH_MONITOR, jobId);
                     String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                    logger.info("fetch monitor : " + jsonStr + ";master:" + pos.getJournalName() + "#" + pos.getPosition() + ";fetch:" + fetchLast.getHeader().getLogfileName() + "#" + fetchLast.getHeader().getLogfileOffset());
                     KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                     phMonitorSender.sendKeyMsg(km);
                     minuteMonitor.clear();
                 } catch (Exception e) {
+                    logger.error(e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -455,6 +529,7 @@ public class HandlerKafkaZkLocal {
                     if(entry == null) continue;
                     //add the entry to the queue
                     entryQueue.put(entry);
+                    fetchLast = entry;
                     counter++;
                     minuteMonitor.fetchNum++;
                     monitor.batchSize += event.getEventLen();
@@ -510,7 +585,9 @@ public class HandlerKafkaZkLocal {
                 }
                 //all exception we will reload the job
                 globalFetchThread = 1;
+                return;
             }
+            fetchSurvival = false;
         }
 
         private void init() throws Exception {
@@ -571,91 +648,91 @@ public class HandlerKafkaZkLocal {
                 pos = -1;
                 xidValue = globalBinlogName + ":" + "-1" + ":" + globalXidBatchId + ":" + globalXidInBatchId;
             }
-//            try {
-//                if(!zkExecutor.exists(config.minutePath+"/"+date)) {
-//                    zkExecutor.create(config.minutePath+"/"+date,date);
-//                }
-//                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
-//                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
-//                }
-//                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
-//                    zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
-//                }
-//                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
-//                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
-//                } else {
-//                    zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
-//                }
-//            } catch (Exception e) {
-//                //send monitor
-//                final String exmsg = e.getMessage();
-//                Thread sendMonitor = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            TrackerMonitor exMonitor = new TrackerMonitor();
-//                            exMonitor.exMsg = exmsg;
-//                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
-//                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
-//                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
-//                            phMonitorSender.sendKeyMsg(km);
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                });
-//                sendMonitor.start();
-//                e.printStackTrace();
-//                logger.error("minute time err: " + e.getMessage());
-//                logger.error(e.getMessage());
-//                boolean isconn = false;
-//                int retryZk = 0;
-//                while (!isconn) { //retry
-//                    if(retryZk >= config.retrys) {//reload
-//                        globalFetchThread = 1;
-//                        return;
-//                    }
-//                    retryZk++;
-//                    try {
-//                        if(!zkExecutor.exists(config.minutePath+"/"+date)) {
-//                            zkExecutor.create(config.minutePath+"/"+date,date);
-//                        }
-//                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
-//                            zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
-//                        }
-//                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
-//                            zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
-//                        }
-//                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
-//                            zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
-//                        } else {
-//                            zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
-//                        }
-//                        isconn = true;
-//                    } catch (Exception e1) {
-//                        //send monitor
-//                        final String exmsg1 = e1.getMessage();
-//                        Thread sendMonitor1 = new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                try {
-//                                    TrackerMonitor exMonitor = new TrackerMonitor();
-//                                    exMonitor.exMsg = exmsg1;
-//                                    JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
-//                                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
-//                                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
-//                                    phMonitorSender.sendKeyMsg(km);
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        });
-//                        sendMonitor1.start();
-//                        logger.error("retrying...... Exception:" +e1.getMessage());
-//                        delay(3);
-//                    }
-//                }
-//            }
+            try {
+                if(!zkExecutor.exists(config.minutePath+"/"+date)) {
+                    zkExecutor.create(config.minutePath+"/"+date,date);
+                }
+                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
+                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
+                }
+                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
+                    zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
+                }
+                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
+                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
+                } else {
+                    zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
+                }
+            } catch (Exception e) {
+                //send monitor
+                final String exmsg = e.getMessage();
+                Thread sendMonitor = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TrackerMonitor exMonitor = new TrackerMonitor();
+                            exMonitor.exMsg = exmsg;
+                            JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                            String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                            phMonitorSender.sendKeyMsg(km);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                sendMonitor.start();
+                e.printStackTrace();
+                logger.error("minute time err: " + e.getMessage());
+                logger.error(e.getMessage());
+                boolean isconn = false;
+                int retryZk = 0;
+                while (!isconn) { //retry
+                    if(retryZk >= config.retrys) {//reload
+                        globalFetchThread = 1;
+                        return;
+                    }
+                    retryZk++;
+                    try {
+                        if(!zkExecutor.exists(config.minutePath+"/"+date)) {
+                            zkExecutor.create(config.minutePath+"/"+date,date);
+                        }
+                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
+                            zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
+                        }
+                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
+                            zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
+                        }
+                        if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
+                            zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
+                        } else {
+                            zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
+                        }
+                        isconn = true;
+                    } catch (Exception e1) {
+                        //send monitor
+                        final String exmsg1 = e1.getMessage();
+                        Thread sendMonitor1 = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    TrackerMonitor exMonitor = new TrackerMonitor();
+                                    exMonitor.exMsg = exmsg1;
+                                    JrdwMonitorVo jmv = exMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.EXCEPTION_MONITOR, jobId);
+                                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                                    KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
+                                    phMonitorSender.sendKeyMsg(km);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        sendMonitor1.start();
+                        logger.error("retrying...... Exception:" +e1.getMessage());
+                        delay(3);
+                    }
+                }
+            }
             logger.info("===================================> per minute thread :");
             logger.info("---> binlog file is " + globalBinlogName +
                     ",position is :" + pos + "; batch id is :" + globalXidBatchId +
@@ -698,6 +775,12 @@ public class HandlerKafkaZkLocal {
                 globalFetchThread = 1;
                 return;
             }
+            //check fetch survival
+            if(!fetchSurvival) {
+                logger.info("fetch thread had been dead, reload the job ......");
+                globalFetchThread = 1;
+                return;
+            }
         }
 
         private boolean isMysqlConnected() {
@@ -734,26 +817,27 @@ public class HandlerKafkaZkLocal {
             CanalEntry.Entry entry = entryQueue.take();
             if(entry == null) continue;
             lastEntry = entry;//all entry can be last entry !!!!!
-            //filter
-            // re-pack the entry
-            entry =
-                    CanalEntry.Entry.newBuilder()
-                            .setHeader(entry.getHeader())
-                            .setEntryType(entry.getEntryType())
-                            .setStoreValue(entry.getStoreValue())
-                            .setBatchId(batchId)
-                            .setInId(inBatchId)
-                            .setIp(config.address)
-                            .build();
-            inBatchId++;//batchId.inId almost point next event's position
-            if(isEndEntry(entry)) {// instead of isEndEntry(entry)
-                inBatchId = 0;
-                batchId++;
+            if(config.filterMap.size() == 0 || isInMap(entry.getHeader().getSchemaName() + "." + entry.getHeader().getTableName())) {
+                // re-pack the entry
+                entry =
+                        CanalEntry.Entry.newBuilder()
+                                .setHeader(entry.getHeader())
+                                .setEntryType(entry.getEntryType())
+                                .setStoreValue(entry.getStoreValue())
+                                .setBatchId(batchId)
+                                .setInId(inBatchId)
+                                .setIp(config.address)
+                                .build();
+                inBatchId++;//batchId.inId almost point next event's position
+                if(isEndEntry(entry)) {// instead of isEndEntry(entry)
+                    inBatchId = 0;
+                    batchId++;
+                }
+                byte[] value = entry.toByteArray();
+                monitor.batchSize += value.length;
+                KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.topic, null, value);
+                messageList.add(km);
             }
-            byte[] value = entry.toByteArray();
-            monitor.batchSize += value.length;
-            KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.topic, null, value);
-            messageList.add(km);
             if(messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) break;
         }
         //per minute record
@@ -799,6 +883,7 @@ public class HandlerKafkaZkLocal {
                     try {
                         JrdwMonitorVo jmv = phMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.PERSIS_MONITOR, jobId);
                         String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
+                        logger.info("monitor :" + jsonStr);
                         KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                         phMonitorSender.sendKeyMsg(km);
                     } catch (Exception e) {
@@ -1042,6 +1127,7 @@ public class HandlerKafkaZkLocal {
     }
 
     public void close(String id) throws Exception {
+        logger.info("closing......");
         fetcher.iskilled = true;//stop the fetcher thread
         fetcher.shutdown();//stop the fetcher's timer task
         minter.cancel();//stop the per minute record
@@ -1061,5 +1147,4 @@ public class HandlerKafkaZkLocal {
             super(msg);
         }
     }
-
 }
