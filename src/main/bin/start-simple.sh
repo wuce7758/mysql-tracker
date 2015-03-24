@@ -12,7 +12,7 @@ case "$(uname)" in
 esac
 
 base=${bin_abs_path}/..
-conf=${base}/conf/tracker.properties
+conf=${base}/conf/simple-tracker.properties
 
 export LANG=en_US.UTF-8
 export BASE=$base

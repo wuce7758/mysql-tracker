@@ -25,7 +25,8 @@ public class KafkaSender {
 
     private KafkaConf conf;
     private Producer<String, byte[]> producer;
-    private int retrys = 100;
+    private int retrys = 10;
+    private int reconns = 5;
 
     public KafkaSender(KafkaConf cf) {
         conf = cf;
@@ -70,28 +71,33 @@ public class KafkaSender {
         blockSend(keyMsgs);
     }
 
-    public void sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs) {
-        blockSend(keyMsgs);
+    public int sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs) {
+        return blockSend(keyMsgs);
     }
 
-    public void sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs, KafkaSender sender, TrackerConf config) {
-        blockSend(keyMsgs, sender, config);
+    public int sendKeyMsg(List<KeyedMessage<String, byte[]>> keyMsgs, KafkaSender sender, TrackerConf config) {
+        return blockSend(keyMsgs, sender, config);
     }
 
-    public void sendKeyMsg(KeyedMessage<String, byte[]> km) {
-        blockSend(km);
+    public int sendKeyMsg(KeyedMessage<String, byte[]> km) {
+        return blockSend(km);
     }
 
-    public void sendKeyMsg(KeyedMessage<String, byte[]> km, KafkaSender sender, TrackerConf config) {
-        blockSend(km, sender, config);
+    public int sendKeyMsg(KeyedMessage<String, byte[]> km, KafkaSender sender, TrackerConf config) {
+        return blockSend(km, sender, config);
     }
 
-    public void blockSend(List<KeyedMessage<String, byte[]>> keyMsgs) {
+    public int blockSend(List<KeyedMessage<String, byte[]>> keyMsgs) {
         boolean isAck = false;
         int retryKafka = 0;
+        int reconnKafka = 0;
         while (!isAck) {
             if(retryKafka >= retrys) {
                 reconnect();
+                reconnKafka++;
+                if(reconnKafka > reconns) {
+                    return -1;
+                }
                 logger.warn("retry times out, reconnect the kafka server......");
                 retryKafka = 0;
             }
@@ -104,14 +110,20 @@ public class KafkaSender {
                 delay(3);
             }
         }
+        return 0;
     }
 
-    public void blockSend(List<KeyedMessage<String, byte[]>> keyMsgs, KafkaSender sender, TrackerConf config) {
+    public int blockSend(List<KeyedMessage<String, byte[]>> keyMsgs, KafkaSender sender, TrackerConf config) {
         boolean isAck = false;
         int retryKafka = 0;
+        int reconnKafka = 0;
         while (!isAck) {
             if(retryKafka >= retrys) {
                 reconnect();
+                reconnKafka++;
+                if(reconnKafka > reconns) {
+                    return -1;
+                }
                 logger.warn("retry times out, reconnect the kafka server......");
                 retryKafka = 0;
             }
@@ -135,14 +147,20 @@ public class KafkaSender {
                 delay(3);
             }
         }
+        return 0;
     }
 
-    public void blockSend(KeyedMessage<String, byte[]> keyMsg) {
+    public int blockSend(KeyedMessage<String, byte[]> keyMsg) {
         boolean isAck = false;
         int retryKafka = 0;
+        int reconnKafka = 0;
         while (!isAck) {
             if(retryKafka >= retrys) {
                 reconnect();
+                reconnKafka++;
+                if(reconnKafka > reconns) {
+                    return -1;
+                }
                 logger.warn("retry times out, reconnect the kafka server......");
                 retryKafka = 0;
             }
@@ -155,14 +173,20 @@ public class KafkaSender {
                 delay(3);
             }
         }
+        return 0;
     }
 
-    public void blockSend(KeyedMessage<String, byte[]> keyMsg, KafkaSender sender, TrackerConf config) {
+    public int blockSend(KeyedMessage<String, byte[]> keyMsg, KafkaSender sender, TrackerConf config) {
         boolean isAck = false;
         int retryKafka = 0;
+        int reconnKafka = 0;
         while (!isAck) {
             if(retryKafka >= retrys) {
                 reconnect();
+                reconnKafka ++;
+                if(reconnKafka > reconns) {
+                    return -1;
+                }
                 logger.warn("retry times out, reconnect the kafka server......");
                 retryKafka = 0;
             }
@@ -186,6 +210,7 @@ public class KafkaSender {
                 delay(3);
             }
         }
+        return 0;
     }
 
     private void delay(int sec) {

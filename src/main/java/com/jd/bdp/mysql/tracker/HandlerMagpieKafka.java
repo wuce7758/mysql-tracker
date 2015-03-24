@@ -2,6 +2,7 @@ package com.jd.bdp.mysql.tracker;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.jd.bdp.magpie.MagpieExecutor;
+import tracker.parser.LogEventConvert;
 import filter.FilterMatcher;
 import kafka.driver.producer.KafkaSender;
 import kafka.producer.KeyedMessage;
@@ -28,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 import protocol.json.JSONConvert;
 import protocol.protobuf.CanalEntry;
 import tracker.common.TableMetaCache;
-import tracker.parser.LogEventConvert;
 import tracker.position.EntryPosition;
 import tracker.utils.TrackerConf;
 import zk.client.ZkExecutor;
@@ -475,6 +475,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 long filenum2 = getRearNum(logfile2);
                 long subnum1 = filenum1 - filenum2;
                 long subnum2 = pos1 - pos2;
+                if(filenum2 == 0 || subnum2 == 0) {
+                    return -1;//error position
+                }
                 if(subnum1 != 0) {
                     subnum2 = pos1;
                 }
@@ -496,6 +499,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     minuteMonitor.delayNum = 0;
                     if(fetchLast != null && pos != null) {
                         minuteMonitor.delayNum = getDelayNum(pos.getJournalName(), pos.getPosition(), fetchLast.getHeader().getLogfileName(), fetchLast.getHeader().getLogfileOffset());
+                    } else {
+                        minuteMonitor.delayNum = 0;
+                    }
+                    if(minuteMonitor.delayNum < 0) {
+                        //no data then delay num is 0
+                        minuteMonitor.delayNum = 0;
                     }
                     logger.info("---> fetch delay num :" + minuteMonitor.delayNum);
                     //send monitor phenix
@@ -858,7 +867,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             if(messageList.size() == 0) return;
             monitor.persisNum = messageList.size();
             monitor.delayTime = (System.currentTimeMillis() - lastEntry.getHeader().getExecuteTime());
-            persisteKeyMsg(messageList);
+            if(persisteKeyMsg(messageList) == -1) {
+                logger.info("persistence the data failed !!! reloading ......");
+                globalFetchThread = 1;
+                return;
+            }
             confirmPos(lastEntry);//send the mysql pos batchid inbatchId to zk
             messageList.clear();
         }
@@ -917,10 +930,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
 
     }
     //number / size / yanshi / send kafka time(now - last event of list) | per minute
-    private void persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
+    private int persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
         monitor.sendStart = System.currentTimeMillis();
-        msgSender.sendKeyMsg(msgs, phMonitorSender, config);
+        int flag = msgSender.sendKeyMsg(msgs, phMonitorSender, config);
         monitor.sendEnd = System.currentTimeMillis();
+        return flag;
     }
 
     private void confirmPos(LogEvent last, String bin) throws Exception {

@@ -99,32 +99,44 @@ public class LogEventConvert {
         int eventType = logEvent.getHeader().getType();
         switch (eventType) {
             case LogEvent.ROTATE_EVENT:
+                logger.info("EVENT : rotate");
                 binlogFileName = ((RotateLogEvent) logEvent).getFilename();
                 break;
             case LogEvent.QUERY_EVENT:
+                logger.info("EVENT : query");
                 return parseQueryEvent((QueryLogEvent) logEvent);
             case LogEvent.XID_EVENT:
+                logger.info("EVENT : xid");
                 return parseXidEvent((XidLogEvent) logEvent);
             case LogEvent.TABLE_MAP_EVENT:
+                logger.info("EVENT : table_map");
                 break;
             case LogEvent.WRITE_ROWS_EVENT_V1:
             case LogEvent.WRITE_ROWS_EVENT:
+                logger.info("EVENT : write_rows");
                 return parseRowsEvent((WriteRowsLogEvent) logEvent);
             case LogEvent.UPDATE_ROWS_EVENT_V1:
             case LogEvent.UPDATE_ROWS_EVENT:
+                logger.info("EVENT : update_rows");
                 return parseRowsEvent((UpdateRowsLogEvent) logEvent);
             case LogEvent.DELETE_ROWS_EVENT_V1:
             case LogEvent.DELETE_ROWS_EVENT:
+                logger.info("EVENT : delete_rows");
                 return parseRowsEvent((DeleteRowsLogEvent) logEvent);
             case LogEvent.ROWS_QUERY_LOG_EVENT:
+                logger.info("EVENT : rows_query");
                 return parseRowsQueryEvent((RowsQueryLogEvent) logEvent);
             case LogEvent.ANNOTATE_ROWS_EVENT:
+                logger.info("EVENT : annotate_rows");
                 return parseAnnotateRowsEvent((AnnotateRowsEvent) logEvent);
             case LogEvent.USER_VAR_EVENT:
+                logger.info("EVENT : user_var");
                 return parseUserVarLogEvent((UserVarLogEvent) logEvent);
             case LogEvent.INTVAR_EVENT:
+                logger.info("EVENT : intvar");
                 return parseIntrvarLogEvent((IntvarLogEvent) logEvent);
             case LogEvent.RAND_EVENT:
+                logger.info("EVENT : rand");
                 return parseRandLogEvent((RandLogEvent) logEvent);
             default:
                 break;
@@ -303,6 +315,7 @@ public class LogEventConvert {
                 return null;
             }
             // check my filter
+            logger.info("!!!!!!!!!!!!!debug :" + fullname);
             if(filterMap.size() > 0 && filterMap.containsKey(fullname) == false) {
                 return null;
             }

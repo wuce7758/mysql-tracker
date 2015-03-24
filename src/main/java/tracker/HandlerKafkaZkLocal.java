@@ -858,7 +858,11 @@ public class HandlerKafkaZkLocal implements MagpieExecutor {
             if(messageList.size() == 0) return;
             monitor.persisNum = messageList.size();
             monitor.delayTime = (System.currentTimeMillis() - lastEntry.getHeader().getExecuteTime());
-            persisteKeyMsg(messageList);
+            if(persisteKeyMsg(messageList) == -1) {
+                logger.info("persistence the data failed !!! reloading ......");
+                globalFetchThread = 1;
+                return;
+            }
             confirmPos(lastEntry);//send the mysql pos batchid inbatchId to zk
             messageList.clear();
         }
@@ -918,10 +922,11 @@ public class HandlerKafkaZkLocal implements MagpieExecutor {
 
     }
     //number / size / yanshi / send kafka time(now - last event of list) | per minute
-    private void persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
+    private int persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
         monitor.sendStart = System.currentTimeMillis();
-        msgSender.sendKeyMsg(msgs, phMonitorSender, config);
+        int flag = msgSender.sendKeyMsg(msgs, phMonitorSender, config);
         monitor.sendEnd = System.currentTimeMillis();
+        return flag;
     }
 
     private void confirmPos(LogEvent last, String bin) throws Exception {

@@ -12,13 +12,16 @@ import mysql.driver.packets.client.BinlogDumpCommandPacket;
 import mysql.driver.packets.server.ResultSetPacket;
 import mysql.driver.utils.PacketManager;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import protocol.protobuf.CanalEntry;
 import tracker.common.TableMetaCache;
 import tracker.parser.LogEventConvert;
 import tracker.position.EntryPosition;
+import tracker.utils.TrackerConf;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -51,6 +54,7 @@ public class SimpleMysqlTracker {
     private DirectLogFetcherChannel fetcher;
     private LogDecoder decoder;
     private LogContext context;
+    public String CLASS_PREFIX = "classpath:";
 
     private void loadOnlineConf() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/hackerwin7/configuration-service/master/simple-tracker.properties");
@@ -65,7 +69,15 @@ public class SimpleMysqlTracker {
     }
 
     private void loadFileConf() throws Exception {
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream("simple-tracker.properties");
+        String cnf = System.getProperty("tracker.conf", "classpath:simple-tracker.properties");
+        logger.info("load file : " + cnf);
+        InputStream in = null;
+        if(cnf.startsWith(CLASS_PREFIX)) {
+            cnf = StringUtils.substringAfter(cnf, CLASS_PREFIX);
+            in = TrackerConf.class.getClassLoader().getResourceAsStream(cnf);
+        } else {
+            in = new FileInputStream(cnf);
+        }
         Properties po = new Properties();
         po.load(in);
         addr = po.getProperty("address");
@@ -73,6 +85,7 @@ public class SimpleMysqlTracker {
         slaveId = Long.valueOf(po.getProperty("slaveId"));
         username = po.getProperty("username");
         password = po.getProperty("password");
+        logger.info("load conf:" + addr + "," + port + "," + slaveId + "," + username + "," + password);
     }
 
     private void preDump() throws Exception {
