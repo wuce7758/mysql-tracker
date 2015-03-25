@@ -2,6 +2,7 @@ package com.jd.bdp.mysql.tracker;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.jd.bdp.magpie.MagpieExecutor;
+import net.sf.json.JSONObject;
 import tracker.parser.LogEventConvert;
 import filter.FilterMatcher;
 import kafka.driver.producer.KafkaSender;
@@ -509,14 +510,14 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     logger.info("---> fetch delay num :" + minuteMonitor.delayNum);
                     //send monitor phenix
                     JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.FETCH_MONITOR, jobId);
-                    String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
-                    logger.info("!!!debug: " + jsonStr + ";master:" + pos.getJournalName() + "#" + pos.getPosition() + ";fetch:" + fetchLast.getHeader().getLogfileName() + "#" + fetchLast.getHeader().getLogfileOffset());
+                    JSONObject jmvObject = JSONConvert.JrdwMonitorVoToJson(jmv);
+                    String jsonStr = jmvObject.toString();
+                    logger.info("fetch monitor json: " + jsonStr);
                     KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                     phMonitorSender.sendKeyMsg(km);
                     minuteMonitor.clear();
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
-                    e.printStackTrace();
+                    logger.error("fetch monitor error: ##############" + e.getMessage(), e);
                 }
             }
         }
@@ -864,9 +865,11 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         // mysqlbinlog:pos <- no filter list's xid  batchid:inBatchId <- filter list's last event
         //entryList data to kafka , per time must confirm the position
         if((messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
-            if(messageList.size() == 0) return;
-            monitor.persisNum = messageList.size();
-            monitor.delayTime = (System.currentTimeMillis() - lastEntry.getHeader().getExecuteTime());
+            //if(lastEntry == null) return; // not messageList but entryList or lastEntry , when we fetched not filtered data , we also confirm the position for it
+            if(messageList.size() > 0) {
+                monitor.persisNum = messageList.size();
+                monitor.delayTime = (System.currentTimeMillis() - lastEntry.getHeader().getExecuteTime());
+            }
             if(persisteKeyMsg(messageList) == -1) {
                 logger.info("persistence the data failed !!! reloading ......");
                 globalFetchThread = 1;
@@ -874,6 +877,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             }
             confirmPos(lastEntry);//send the mysql pos batchid inbatchId to zk
             messageList.clear();
+            if(lastEntry != null) {//adjust output too much
+                logger.info("=====================================> confirm pos , it may be filtered data, but we also need confirm it:");
+                logger.info("---> position info:" + " binlog file is " + globalBinlogName +
+                        ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
+                        ",in batch id is :" + globalXidInBatchId);
+            }
         }
         if(monitor.persisNum > 0) {
             monitor.persistenceStart = startTime;
@@ -884,10 +893,6 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             logger.info("---> parser delay time:" + monitor.delayTime + " ms");
             logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
             logger.info("---> entry list to bytes sum size is " + monitor.batchSize / config.mbUnit + " MB");
-            if(lastEntry != null)
-                logger.info("---> position info:"+" binlog file is " + globalBinlogName +
-                        ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
-                        ",in batch id is :" + globalXidInBatchId);
             //send phoenix monitor
             final TrackerMonitor phMonitor = monitor.cloneDeep();
             Thread sendMonitor = new Thread(new Runnable() {
@@ -931,6 +936,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     }
     //number / size / yanshi / send kafka time(now - last event of list) | per minute
     private int persisteKeyMsg(List<KeyedMessage<String, byte[]>> msgs) {
+        if(msgs.size() == 0) return 0;
         monitor.sendStart = System.currentTimeMillis();
         int flag = msgSender.sendKeyMsg(msgs, phMonitorSender, config);
         monitor.sendEnd = System.currentTimeMillis();

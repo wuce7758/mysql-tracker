@@ -10,12 +10,12 @@ import java.util.Map;
  */
 public class JSONConvert {
 
-    public static JSONObject MapToJson(Map m) {
+    public static JSONObject MapToJson(Map m) throws Exception {
         if(m == null) return null;
         return JSONObject.fromObject(m);
     }
 
-    public static JSONObject JrdwMonitorVoToJson(JrdwMonitorVo jmv) {
+    public static JSONObject JrdwMonitorVoToJson(JrdwMonitorVo jmv) throws Exception {
         if(jmv == null) return null;
         return JSONObject.fromObject(jmv);
     }

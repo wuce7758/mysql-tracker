@@ -100,7 +100,7 @@ public class TrackerMonitor implements Cloneable {
         exMsg = ip = "";
     }
 
-    public JrdwMonitorVo toJrdwMonitor(int id) {
+    public JrdwMonitorVo toJrdwMonitor(int id) throws Exception {
         JrdwMonitorVo jmv = new JrdwMonitorVo();
         jmv.setId(id);
         //pack the member / value  to the Map<String,String> or Map<String,Long>
@@ -124,7 +124,7 @@ public class TrackerMonitor implements Cloneable {
         return jmv;
     }
 
-    public JrdwMonitorVo toJrdwMonitor(int id, String jobId) {
+    public JrdwMonitorVo toJrdwMonitor(int id, String jobId) throws Exception {
         JrdwMonitorVo jmv = new JrdwMonitorVo();
         jmv.setId(id);
         jmv.setJrdw_mark(jobId);
@@ -150,7 +150,7 @@ public class TrackerMonitor implements Cloneable {
         return jmv;
     }
 
-    public JrdwMonitorVo toJrdwMonitorOnline(int id, String jobId) {
+    public JrdwMonitorVo toJrdwMonitorOnline(int id, String jobId) throws Exception {
         JrdwMonitorVo jmv = new JrdwMonitorVo();
         jmv.setId(id);
         jmv.setJrdw_mark(jobId);
