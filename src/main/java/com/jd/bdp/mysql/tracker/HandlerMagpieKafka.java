@@ -877,12 +877,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             }
             confirmPos(lastEntry);//send the mysql pos batchid inbatchId to zk
             messageList.clear();
-            if(lastEntry != null) {//adjust output too much
-                logger.info("=====================================> confirm pos , it may be filtered data, but we also need confirm it:");
-                logger.info("---> position info:" + " binlog file is " + globalBinlogName +
-                        ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
-                        ",in batch id is :" + globalXidInBatchId);
-            }
+//            if(lastEntry != null) {//adjust output too much
+//                logger.info("=====================================> confirm pos , it may be filtered data, but we also need confirm it:");
+//                logger.info("---> position info:" + " binlog file is " + globalBinlogName +
+//                        ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
+//                        ",in batch id is :" + globalXidInBatchId);
+//            }
         }
         if(monitor.persisNum > 0) {
             monitor.persistenceStart = startTime;
@@ -893,6 +893,9 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             logger.info("---> parser delay time:" + monitor.delayTime + " ms");
             logger.info("---> the number of entry list: " + monitor.persisNum  + " entries");
             logger.info("---> entry list to bytes sum size is " + monitor.batchSize / config.mbUnit + " MB");
+            logger.info("---> position info:" + " binlog file is " + globalBinlogName +
+                    ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
+                    ",in batch id is :" + globalXidInBatchId);
             //send phoenix monitor
             final TrackerMonitor phMonitor = monitor.cloneDeep();
             Thread sendMonitor = new Thread(new Runnable() {
