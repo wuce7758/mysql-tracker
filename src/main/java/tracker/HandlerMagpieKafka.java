@@ -111,6 +111,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     private List<KeyedMessage<String, byte[]>> messageList;
     //thread survival confirmation
     private boolean fetchSurvival = true;
+    //thread is finish or run once
+    private boolean isFetchRunning = false;
     //debug var
 
     //delay time
@@ -277,6 +279,8 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         //global var
         entryList = new ArrayList<CanalEntry.Entry>();
         messageList = new ArrayList<KeyedMessage<String, byte[]>>();
+        isFetchRunning = false;
+        lastEntry = null;
     }
 
     private void initZk() throws Exception {
@@ -512,10 +516,10 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     JrdwMonitorVo jmv = minuteMonitor.toJrdwMonitorOnline(JDMysqlTrackerMonitorType.FETCH_MONITOR, jobId);
                     JSONObject jmvObject = JSONConvert.JrdwMonitorVoToJson(jmv);
                     String jsonStr = jmvObject.toString();
-                    logger.info("fetch monitor json: " + jsonStr);
                     KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                     phMonitorSender.sendKeyMsg(km);
                     minuteMonitor.clear();
+                    logger.info("fetch monitor json: " + jsonStr);
                 } catch (Exception e) {
                     logger.error("fetch monitor error: ##############" + e.getMessage(), e);
                 }
@@ -527,6 +531,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 init();
                 int counter = 0;
                 timer.schedule(timerMonitor, 1000, config.monitorsec * 1000);//start thread
+                isFetchRunning = true;
                 while (fetcher.fetch()) {
                     if (counter == 0) monitor.fetchStart = System.currentTimeMillis();
                     event = decoder.decode(fetcher, context);
@@ -569,22 +574,20 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                             String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
                             KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                             phMonitorSender.sendKeyMsg(km);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        } catch (Exception e1) {
+                            logger.error("send exception to kafka failed, " + e1.getMessage(), e1);
                         }
                     }
                 });
                 sendMonitor.start();
-                logger.error("fetch thread error : " + e.getMessage());
-                e.printStackTrace();
+                logger.error("fetch thread error : " + e.getMessage(), e);
                 String errMsg = e.getMessage();
                 if(errMsg.contains("errno = 1236")) {
                     try {
                         String zkPos = config.persisPath + "/" + jobId;
                         zkExecutor.delete(zkPos);//invalid position
                     } catch (Exception e1) {
-                        logger.error(e1.getMessage());
-                        e1.printStackTrace();
+                        logger.error(e1.getMessage(), e1);
                     }
                     globalFetchThread = 1;//reload
                     return;
@@ -692,9 +695,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                     }
                 });
                 sendMonitor.start();
-                e.printStackTrace();
-                logger.error("minute time err: " + e.getMessage());
-                logger.error(e.getMessage());
+                logger.error("minute record position thread exception, " + e.getMessage(), e);
                 boolean isconn = false;
                 int retryZk = 0;
                 while (!isconn) { //retry
@@ -755,6 +756,12 @@ public class HandlerMagpieKafka implements MagpieExecutor {
 
         public void run() {
             logger.info("=================================> check assembly heartbeats......");
+
+            //run function heartbeat
+            logger.info("-------> globalFetchThread :" + globalFetchThread);
+            logger.info("-------> size of entryQueue :" + entryQueue.size());
+            logger.info("-------> fetchSurvival :" + fetchSurvival);
+
             //check mysql connection heartbeat
             if(!logConnector.isConnected() || !tableConnector.isConnected() || !realConnector.isConnected()) {
                 logger.info("mysql connection loss, reload the job ......");
@@ -822,6 +829,13 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             delay(5);
             return;
         }
+
+        //waiting for prepare finish and prepare's thread finish or run onece
+        if(!isFetchRunning){
+            delay(1);
+            return;
+        }
+
         //take the data from the queue
         while (!entryQueue.isEmpty()) {
             CanalEntry.Entry entry = entryQueue.take();
@@ -851,17 +865,17 @@ public class HandlerMagpieKafka implements MagpieExecutor {
             if(messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) break;
         }
         //per minute record
-        if(lastEntry != null) {
-            binlog = lastEntry.getHeader().getLogfileName();
-            globalBinlogName = binlog;
-            globalXidEntry = lastEntry;
-            globalXidBatchId = batchId;
-            globalXidInBatchId = inBatchId;
-        }
+//        if(lastEntry != null) {
+//            binlog = lastEntry.getHeader().getLogfileName();
+//            globalBinlogName = binlog;
+//            globalXidEntry = lastEntry;
+//            globalXidBatchId = batchId;
+//            globalXidInBatchId = inBatchId;
+//        }
         // serialize the list -> filter -> batch for it -> send the batched bytes to the kafka; persistence the batched list???
         // or no batched list???
         // I got it : mysqlbinlog:pos could be no filtered event but batchId and inBatchId must be filtered event
-        //     so the mysqlbinlog:pos <--> batchId:inBatchId Do not must be same event to same event
+        //     so the mysqlbinlog:pos <--> batchId:inBatchId Not must be same event to same event
         // mysqlbinlog:pos <- no filter list's xid  batchid:inBatchId <- filter list's last event
         //entryList data to kafka , per time must confirm the position
         if((messageList.size() >= config.batchsize || (monitor.batchSize / config.mbUnit) >= config.spacesize ) || (System.currentTimeMillis() - startTime) > config.timeInterval * 1000 ) {
@@ -876,13 +890,15 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 return;
             }
             confirmPos(lastEntry);//send the mysql pos batchid inbatchId to zk
+            //per minute record
+            if(lastEntry != null) {
+                binlog = lastEntry.getHeader().getLogfileName();
+                globalBinlogName = binlog;
+                globalXidEntry = lastEntry;
+                globalXidBatchId = batchId;
+                globalXidInBatchId = inBatchId;
+            }
             messageList.clear();
-//            if(lastEntry != null) {//adjust output too much
-//                logger.info("=====================================> confirm pos , it may be filtered data, but we also need confirm it:");
-//                logger.info("---> position info:" + " binlog file is " + globalBinlogName +
-//                        ",position is :" + (lastEntry.getHeader().getLogfileOffset() + lastEntry.getHeader().getEventLength()) + "; batch id is :" + globalXidBatchId +
-//                        ",in batch id is :" + globalXidInBatchId);
-//            }
         }
         if(monitor.persisNum > 0) {
             monitor.persistenceStart = startTime;
@@ -906,6 +922,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                         String jsonStr = JSONConvert.JrdwMonitorVoToJson(jmv).toString();
                         KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(config.phKaTopic, null, jsonStr.getBytes("UTF-8"));
                         phMonitorSender.sendKeyMsg(km);
+                        logger.info("monitor persistence:" + jsonStr);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
