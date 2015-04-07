@@ -315,7 +315,6 @@ public class LogEventConvert {
                 return null;
             }
             // check my filter
-            logger.info("!!!!!!!!!!!!!debug :" + fullname);
             if(filterMap.size() > 0 && filterMap.containsKey(fullname) == false) {
                 return null;
             }
