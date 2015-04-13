@@ -1166,7 +1166,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
     }
 
     public void close(String id) throws Exception {
-        logger.info("closing......");
+        logger.info("closing the job......");
         fetcher.iskilled = true;//stop the fetcher thread
         fetcher.shutdown();//stop the fetcher's timer task
         minter.cancel();//stop the per minute record
@@ -1179,6 +1179,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
         msgSender.close();
         zkExecutor.close();
         config.clear();
+        throw new Exception("switch the new node to start the job ......");
     }
 
     class RetryTimesOutException extends Exception {
