@@ -6,7 +6,7 @@
 
     <groupId>mysql-tracker</groupId>
     <artifactId>mysql-tracker</artifactId>
-    <version>1.1.5.11</version>
+    <version>1.2.0</version>
 
     <dependencies>
         <dependency>
@@ -243,7 +243,7 @@
                     <excludes>
                         <exclude>**/tracker.properties</exclude>
                         <exclude>**/simple-tracker.properties</exclude>
-                        <exclude>**/log4j.properties</exclude>
+                        <!--<exclude>**/log4j.properties</exclude>-->
                         <exclude>**/input_config.yaml</exclude>
                     </excludes>
                 </configuration>
@@ -261,8 +261,8 @@
                 </executions>
                 <configuration>
                     <descriptors>
-                        <descriptor>assembly-magpie.xml</descriptor>
-                        <!--<descriptor>/src/main/assembly/assembly.xml</descriptor>-->
+                        <!--<descriptor>assembly-magpie.xml</descriptor>-->
+                        <descriptor>/src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>

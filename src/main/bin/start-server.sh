@@ -13,6 +13,7 @@ esac
 
 base=${bin_abs_path}/..
 conf=${base}/conf/tracker.properties
+log4j=${base}/conf/log4j.properties
 
 export LANG=en_US.UTF-8
 export BASE=$base
@@ -73,7 +74,7 @@ else
 fi
 
 JAVA_OPTS=" $JAVA_OPTS -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8"
-TRACKER_OPTS="-DappName=mysql-tracker -Dtracker.conf=$conf"
+TRACKER_OPTS="-DappName=mysql-tracker -Dtracker.conf=$conf -Dtracker.log4j=$log4j"
 
 echo conf : $conf
 

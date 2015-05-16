@@ -256,7 +256,7 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 delay(3);
             }
         }
-        initZk();
+        //initZk();
         //filter
         fm = new FilterMatcher(config.filterRegex);
         //event convert
@@ -662,20 +662,20 @@ public class HandlerMagpieKafka implements MagpieExecutor {
                 xidValue = globalBinlogName + ":" + "-1" + ":" + globalXidBatchId + ":" + globalXidInBatchId;
             }
             try {
-                if(!zkExecutor.exists(config.minutePath+"/"+date)) {
-                    zkExecutor.create(config.minutePath+"/"+date,date);
-                }
-                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
-                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
-                }
-                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
-                    zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
-                }
-                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
-                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
-                } else {
-                    zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
-                }
+//                if(!zkExecutor.exists(config.minutePath+"/"+date)) {
+//                    zkExecutor.create(config.minutePath+"/"+date,date);
+//                }
+//                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour)) {
+//                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour, hour);
+//                }
+//                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time)) {
+//                    zkExecutor.create(config.minutePath + "/" + date + "/" + hour + "/" + time, time);
+//                }
+//                if(!zkExecutor.exists(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId)) {
+//                    zkExecutor.create(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
+//                } else {
+//                    zkExecutor.set(config.minutePath+"/"+date+"/"+hour+"/"+time+"/"+jobId, xidValue);
+//                }
             } catch (Exception e) {
                 //send monitor
                 final String exmsg = e.getMessage();

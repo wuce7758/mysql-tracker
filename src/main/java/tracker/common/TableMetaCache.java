@@ -7,7 +7,6 @@ import mysql.driver.MysqlQueryExecutor;
 import mysql.driver.packets.server.FieldPacket;
 import mysql.driver.packets.server.ResultSetPacket;
 import org.apache.commons.lang.StringUtils;
-
 import tracker.common.TableMeta.FieldMeta;
 
 import java.io.IOException;

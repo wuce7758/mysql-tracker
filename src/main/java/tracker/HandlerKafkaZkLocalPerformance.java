@@ -2,13 +2,13 @@ package tracker;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.jd.bdp.magpie.MagpieExecutor;
+import com.jd.bdp.monitors.constants.JDMysqlTrackerMonitorType;
 import filter.FilterMatcher;
 import kafka.driver.producer.KafkaSender;
 import kafka.producer.KeyedMessage;
 import kafka.utils.KafkaConf;
 import monitor.JrdwMonitorVo;
 import monitor.TrackerMonitor;
-import com.jd.bdp.monitors.constants.JDMysqlTrackerMonitorType;
 import mysql.dbsync.DirectLogFetcherChannel;
 import mysql.dbsync.LogContext;
 import mysql.dbsync.LogDecoder;
@@ -49,11 +49,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by hp on 14-12-12.
+ * Created by hp on 5/15/15.
  */
-public class HandlerKafkaZkLocal implements MagpieExecutor {
+public class HandlerKafkaZkLocalPerformance implements MagpieExecutor {
     //logger
-    private Logger logger = LoggerFactory.getLogger(HandlerKafkaZkLocal.class);
+    private Logger logger = LoggerFactory.getLogger(HandlerKafkaZkLocalPerformance.class);
     //global config
     private TrackerConf config = new TrackerConf();
     //mysql interface
